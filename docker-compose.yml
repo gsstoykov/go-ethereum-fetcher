@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  api-go:
+    image: api-go
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:pwd@db:5432/postgres
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+  db:
+    image: postgres:16.0-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=pwd
+    networks:
+      - backend
+    ports:
+      - 5432:5432
+volumes:
+  pgdata:
+networks:
+  backend:
