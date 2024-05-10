@@ -14,7 +14,7 @@ COPY . .
 RUN go build \
     -ldflags="-linkmode external -extldflags -static" \
     -tags netgo \
-    -o api-go
+    -o api-go ./cmd
 
 EXPOSE 8080
 

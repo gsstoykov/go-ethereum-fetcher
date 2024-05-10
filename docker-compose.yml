@@ -10,6 +10,8 @@ services:
       - db
     environment:
       - DATABASE_URL=postgres://postgres:pwd@db:5432/postgres
+    networks:
+      - backend
     ports:
       - 8080:8080
     restart: unless-stopped
@@ -19,6 +21,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=pwd
+      - POSTGRES_DB=db 
     networks:
       - backend
     ports:
