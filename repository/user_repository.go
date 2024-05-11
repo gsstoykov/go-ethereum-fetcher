@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepositoryInterface interface {
+type IUserRepository interface {
 	Create(user *model.User) (*model.User, error)
 	Update(user *model.User) (*model.User, error)
 	Delete(userId int) (*model.User, error)
@@ -19,7 +19,7 @@ type UserRepository struct {
 	Db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepositoryInterface {
+func NewUserRepository(db *gorm.DB) IUserRepository {
 	return &UserRepository{Db: db}
 }
 

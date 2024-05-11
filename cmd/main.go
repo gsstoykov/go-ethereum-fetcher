@@ -1,14 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
 	"os"
-	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/gsstoykov/go-ethereum-fetcher/handlers"
+	"github.com/gsstoykov/go-ethereum-fetcher/cmd/api"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -32,28 +28,12 @@ func main() {
 		panic(err)
 	}
 
-	router := gin.Default()
-	router.GET("users", handlers.GetUsers)
-
-	server := &http.Server{
-		Addr:           ":" + port,
-		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-
 	db, err := gorm.Open(postgres.Open(connstr), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Could not connect to db: %v", err)
 		panic(err)
 	}
 
-	fmt.Println(db)
-
-	err = server.ListenAndServe()
-	if err != nil {
-		panic(err)
-	}
-
+	ef := api.NewEthereumFetcher(port, db)
+	ef.Listen()
 }

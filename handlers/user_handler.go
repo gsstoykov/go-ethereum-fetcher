@@ -8,17 +8,16 @@ import (
 )
 
 type UserHandler struct {
-	ur *repository.UserRepository
+	ur repository.IUserRepository
 }
 
-func NewUserHandler(ur *repository.UserRepository) *UserHandler {
+func NewUserHandler(ur repository.IUserRepository) *UserHandler {
 	return &UserHandler{
 		ur: ur,
 	}
 }
 
-func GetUsers(c *gin.Context) {
-
+func (uh UserHandler) GetUsers(c *gin.Context) {
 	message := "Hello from gin no users currently!"
 	c.JSON(http.StatusOK, gin.H{"message": message})
 }
