@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gsstoykov/go-ethereum-fetcher/cmd/api"
+	"github.com/gsstoykov/go-ethereum-fetcher/model"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -33,6 +34,8 @@ func main() {
 		log.Fatalf("Could not connect to db: %v", err)
 		panic(err)
 	}
+
+	db.AutoMigrate(&model.User{})
 
 	ef := api.NewEthereumFetcher(port, db)
 	ef.Listen()

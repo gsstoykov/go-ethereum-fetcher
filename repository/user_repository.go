@@ -12,7 +12,7 @@ type IUserRepository interface {
 	Update(user *model.User) (*model.User, error)
 	Delete(userId int) (*model.User, error)
 	FindById(userId int) (*model.User, error)
-	FindAll() ([]*model.User, error)
+	FindAll() ([]model.User, error)
 }
 
 type UserRepository struct {
@@ -65,9 +65,9 @@ func (r *UserRepository) FindById(userId int) (*model.User, error) {
 	return user, nil
 }
 
-func (r *UserRepository) FindAll() ([]*model.User, error) {
-	var users []*model.User
-	if err := r.Db.Find(users).Error; err != nil {
+func (r *UserRepository) FindAll() ([]model.User, error) {
+	var users []model.User
+	if err := r.Db.Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil

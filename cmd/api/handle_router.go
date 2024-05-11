@@ -16,6 +16,7 @@ func NewRouter(db *gorm.DB) *HandleRouter {
 		gin_router: gin.Default(),
 	}
 	userHandler := handlers.NewUserHandler(repository.NewUserRepository(db))
-	router.gin_router.GET("users", userHandler.GetUsers)
+	router.gin_router.GET("users", userHandler.FetchUsers)
+	router.gin_router.POST("user", userHandler.CreateUser)
 	return router
 }

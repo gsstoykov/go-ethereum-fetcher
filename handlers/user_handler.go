@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gsstoykov/go-ethereum-fetcher/model"
 	"github.com/gsstoykov/go-ethereum-fetcher/repository"
 )
 
@@ -17,7 +18,28 @@ func NewUserHandler(ur repository.IUserRepository) *UserHandler {
 	}
 }
 
-func (uh UserHandler) GetUsers(c *gin.Context) {
-	message := "Hello from gin no users currently!"
-	c.JSON(http.StatusOK, gin.H{"message": message})
+func (uh UserHandler) FetchUsers(ctx *gin.Context) {
+	var us []model.User
+	us, err := uh.ur.FindAll()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"users": us})
+}
+
+func (uh UserHandler) CreateUser(ctx *gin.Context) {
+	var u model.User
+	if err := ctx.ShouldBindJSON(&u); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	cu, err := uh.ur.Create(&u)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"user": cu})
 }
