@@ -16,7 +16,12 @@ func NewRouter(db *gorm.DB) *HandleRouter {
 		gin_router: gin.Default(),
 	}
 	userHandler := handlers.NewUserHandler(repository.NewUserRepository(db))
+	transactionHandler := handlers.NewTransactionHandler(repository.NewTransactionRepository(db))
+	// user routes
 	router.gin_router.GET("users", userHandler.FetchUsers)
 	router.gin_router.POST("user", userHandler.CreateUser)
+	// transaction routes
+	router.gin_router.GET("transactions", transactionHandler.FetchTransactions)
+	router.gin_router.POST("transaction", transactionHandler.CreateTransaction)
 	return router
 }
