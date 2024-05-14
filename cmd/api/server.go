@@ -4,27 +4,24 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ethereum/go-ethereum/ethclient"
 	"gorm.io/gorm"
 )
 
 type EthereumFetcher struct {
-	port   string
 	server *http.Server
-	db     *gorm.DB
 }
 
-func NewEthereumFetcher(port string, db *gorm.DB) *EthereumFetcher {
-	router := NewRouter(db)
+func NewEthereumFetcher(port string, db *gorm.DB, client *ethclient.Client) *EthereumFetcher {
+	hm := NewHandleManager(db, client)
 	return &EthereumFetcher{
-		port: port,
 		server: &http.Server{
 			Addr:           ":" + port,
-			Handler:        router.gin_router,
+			Handler:        hm.InitRouter(),
 			ReadTimeout:    10 * time.Second,
 			WriteTimeout:   10 * time.Second,
 			MaxHeaderBytes: 1 << 20,
 		},
-		db: db,
 	}
 }
 
