@@ -4,17 +4,20 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	egateway "github.com/gsstoykov/go-ethereum-fetcher/ethereum"
 	"github.com/gsstoykov/go-ethereum-fetcher/model"
 	"github.com/gsstoykov/go-ethereum-fetcher/repository"
 )
 
 type TransactionHandler struct {
 	tr repository.ITransactionRepository
+	eg egateway.IEthereumGateway
 }
 
-func NewTransactionHandler(tr repository.ITransactionRepository) *TransactionHandler {
+func NewTransactionHandler(tr repository.ITransactionRepository, eg egateway.IEthereumGateway) *TransactionHandler {
 	return &TransactionHandler{
 		tr: tr,
+		eg: eg,
 	}
 }
 
@@ -26,6 +29,16 @@ func (th TransactionHandler) FetchTransactions(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"transactions": ts})
+}
+
+func (th TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
+	txHash := ctx.Param("hash")
+	tx, err := th.tr.FindByTransactionHash(txHash)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"transaction": tx})
 }
 
 func (th TransactionHandler) CreateTransaction(ctx *gin.Context) {

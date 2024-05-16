@@ -12,6 +12,7 @@ type ITransactionRepository interface {
 	Update(transaction *model.Transaction) (*model.Transaction, error)
 	Delete(transactionId int) (*model.Transaction, error)
 	FindById(transactionId int) (*model.Transaction, error)
+	FindByTransactionHash(transactionHash string) (*model.Transaction, error)
 	FindAll() ([]model.Transaction, error)
 }
 
@@ -62,6 +63,14 @@ func (r *TransactionRepository) FindById(transactionId int) (*model.Transaction,
 		return nil, err
 	}
 	return transaction, nil
+}
+
+func (r *TransactionRepository) FindByTransactionHash(transactionHash string) (*model.Transaction, error) {
+	var transaction model.Transaction
+	if err := r.Db.Where("transaction_hash = ?", transactionHash).First(&transaction).Error; err != nil {
+		return nil, err
+	}
+	return &transaction, nil
 }
 
 func (r *TransactionRepository) FindAll() ([]model.Transaction, error) {
