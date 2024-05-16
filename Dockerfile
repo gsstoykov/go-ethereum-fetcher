@@ -19,7 +19,3 @@ RUN go build \
 EXPOSE 8080
 
 CMD ["./api-go"]
-
-# Final Stage usually should go above the CMD
-# FROM scratch
-# COPY --from=build /app/api-go ./api-go
