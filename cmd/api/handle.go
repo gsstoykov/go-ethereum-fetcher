@@ -29,6 +29,7 @@ func (hm *HandleManager) InitRouter() *gin.Engine {
 	// user routes
 	hm.router.GET("users", userHandler.FetchUsers)
 	hm.router.POST("user", userHandler.CreateUser)
+	hm.router.POST("auth", userHandler.Authenticate)
 	// transaction routes
 	hm.router.GET("transactions", transactionHandler.FetchTransactions)
 	hm.router.POST("transaction", transactionHandler.CreateTransaction)

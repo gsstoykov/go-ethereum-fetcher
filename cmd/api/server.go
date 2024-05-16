@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -12,11 +13,11 @@ type EthereumFetcher struct {
 	server *http.Server
 }
 
-func NewEthereumFetcher(port string, db *gorm.DB, client *ethclient.Client) *EthereumFetcher {
+func NewEthereumFetcher(db *gorm.DB, client *ethclient.Client) *EthereumFetcher {
 	hm := NewHandleManager(db, client)
 	return &EthereumFetcher{
 		server: &http.Server{
-			Addr:           ":" + port,
+			Addr:           ":" + os.Getenv("API_PORT"),
 			Handler:        hm.InitRouter(),
 			ReadTimeout:    10 * time.Second,
 			WriteTimeout:   10 * time.Second,
