@@ -38,6 +38,19 @@ func (th TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if tx == nil {
+		tx, err = th.eg.GetByTransactionHash(txHash)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		tx, err = th.tr.Create(tx)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+	}
 	ctx.JSON(http.StatusOK, gin.H{"transaction": tx})
 }
 

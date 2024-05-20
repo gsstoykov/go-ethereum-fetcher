@@ -68,6 +68,9 @@ func (r *TransactionRepository) FindById(transactionId int) (*model.Transaction,
 func (r *TransactionRepository) FindByTransactionHash(transactionHash string) (*model.Transaction, error) {
 	var transaction model.Transaction
 	if err := r.Db.Where("transaction_hash = ?", transactionHash).First(&transaction).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil // No transaction found, return nil
+		}
 		return nil, err
 	}
 	return &transaction, nil
