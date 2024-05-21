@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	egateway "github.com/gsstoykov/go-ethereum-fetcher/ethereum"
 	"github.com/gsstoykov/go-ethereum-fetcher/handlers"
+	"github.com/gsstoykov/go-ethereum-fetcher/handlers/middleware"
 	"github.com/gsstoykov/go-ethereum-fetcher/repository"
 	"gorm.io/gorm"
 )
@@ -31,7 +32,7 @@ func (hm *HandleManager) InitRouter() *gin.Engine {
 		egateway.NewEthereumGateway(hm.client),
 	)
 	// user routes
-	hm.router.GET("/users", userHandler.FetchUsers)
+	hm.router.GET("/users", middleware.AuthenticateMiddleware(), userHandler.FetchUsers)
 	hm.router.POST("/user", userHandler.CreateUser)
 	hm.router.POST("/auth", userHandler.Authenticate)
 	// transaction routes
