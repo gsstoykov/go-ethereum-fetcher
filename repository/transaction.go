@@ -10,8 +10,8 @@ import (
 type ITransactionRepository interface {
 	Create(transaction *model.Transaction) (*model.Transaction, error)
 	Update(transaction *model.Transaction) (*model.Transaction, error)
-	Delete(transactionId int) (*model.Transaction, error)
-	FindById(transactionId int) (*model.Transaction, error)
+	Delete(transactionId uint) (*model.Transaction, error)
+	FindById(transactionId uint) (*model.Transaction, error)
 	FindByTransactionHash(transactionHash string) (*model.Transaction, error)
 	FindAll() ([]model.Transaction, error)
 }
@@ -32,7 +32,7 @@ func (r *TransactionRepository) Create(transaction *model.Transaction) (*model.T
 }
 
 func (r *TransactionRepository) Update(transaction *model.Transaction) (*model.Transaction, error) {
-	existingTransaction, err := r.FindById(transaction.Id)
+	existingTransaction, err := r.FindById(transaction.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (r *TransactionRepository) Update(transaction *model.Transaction) (*model.T
 	return existingTransaction, nil
 }
 
-func (r *TransactionRepository) Delete(transactionId int) (*model.Transaction, error) {
+func (r *TransactionRepository) Delete(transactionId uint) (*model.Transaction, error) {
 	var transaction *model.Transaction
 	if err := r.Db.Where("id = ?", transactionId).Delete(transaction).Error; err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (r *TransactionRepository) Delete(transactionId int) (*model.Transaction, e
 	return transaction, nil
 }
 
-func (r *TransactionRepository) FindById(transactionId int) (*model.Transaction, error) {
+func (r *TransactionRepository) FindById(transactionId uint) (*model.Transaction, error) {
 	var transaction *model.Transaction
 	if err := r.Db.Where("id = ?", transactionId).Error; err != nil {
 		return nil, err

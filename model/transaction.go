@@ -1,7 +1,9 @@
 package model
 
+import "gorm.io/gorm"
+
 type Transaction struct {
-	Id                int    `json:"-" gorm:"primaryKey"`
+	gorm.Model
 	TransactionHash   string `json:"transactionHash" gorm:"column:transaction_hash"`
 	TransactionStatus int    `json:"transactionStatus" gorm:"column:transaction_status"`
 	BlockHash         string `json:"blockHash" gorm:"column:block_hash"`
@@ -12,4 +14,5 @@ type Transaction struct {
 	LogsCount         int    `json:"logsCount" gorm:"column:logs_count"`
 	Input             string `json:"input" gorm:"column:input"`
 	Value             string `json:"value" gorm:"column:value"`
+	UserID            *uint  `json:"user_id" gorm:"index;"`
 }

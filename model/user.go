@@ -1,7 +1,12 @@
 package model
 
+import (
+	"gorm.io/gorm"
+)
+
 type User struct {
-	Id       int    `gorm:"type:int;primary_key"`
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	gorm.Model
+	Username     string        `json:"username" binding:"required" gorm:"unique;not null"`
+	Password     string        `json:"password" binding:"required" gorm:"not null"`
+	Transactions []Transaction `gorm:"foreignKey:UserID"`
 }
