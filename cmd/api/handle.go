@@ -32,12 +32,11 @@ func (hm *HandleManager) InitRouter() *gin.Engine {
 		egateway.NewEthereumGateway(hm.client),
 	)
 	// user routes
-	hm.router.GET("/users", middleware.AuthenticateMiddleware(), userHandler.FetchUsers)
+	hm.router.GET("/users", userHandler.FetchUsers)
 	hm.router.POST("/user", userHandler.CreateUser)
 	hm.router.POST("/auth", userHandler.Authenticate)
 	// transaction routes
 	hm.router.GET("/transactions", transactionHandler.FetchTransactions)
-	hm.router.POST("/transaction", transactionHandler.CreateTransaction)
-	hm.router.GET("/eth/:hash", transactionHandler.FetchTransactionsList)
+	hm.router.GET("/eth", middleware.AuthenticateMiddleware(), transactionHandler.FetchTransactionsList)
 	return hm.router
 }

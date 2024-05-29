@@ -17,8 +17,7 @@ func AuthenticateMiddleware() gin.HandlerFunc {
 		// Extract the token from the Authorization header
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
-			c.Abort()
+			c.Next()
 			return
 		}
 
@@ -33,20 +32,10 @@ func AuthenticateMiddleware() gin.HandlerFunc {
 		// Extract the token string from the header
 		tokenString := headerParts[1]
 
-		fmt.Println("tokenString:")
-		fmt.Println(tokenString)
-
 		// Parse the token
 		token, err := jwt.ParseWithClaims(tokenString, &handlers.JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("JWT_STRING")), nil
 		})
-		// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// 	// Validate the signing method
-		// 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		// 		return nil, jwt.ErrSignatureInvalid
-		// 	}
-		// 	return []byte(os.Getenv("JWT_STRING")), nil
-		// })
 		if err != nil {
 			fmt.Println(err)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Failed to parse token"})

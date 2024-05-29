@@ -32,26 +32,33 @@ func (th TransactionHandler) FetchTransactions(ctx *gin.Context) {
 }
 
 func (th TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
-	txHash := ctx.Param("hash")
-	tx, err := th.tr.FindByTransactionHash(txHash)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	if tx == nil {
-		tx, err = th.eg.GetByTransactionHash(txHash)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		tx, err = th.tr.Create(tx)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
+	// Get the list of transactionHashes
+	transactionHashes := ctx.QueryArray("transactionHashes")
 
+	var txs []model.Transaction
+
+	// Fetch for all transactionHashes
+	for _, txHash := range transactionHashes {
+		tx, err := th.tr.FindByTransactionHash(txHash)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if tx == nil {
+			tx, err = th.eg.GetByTransactionHash(txHash)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+			tx, err = th.tr.Create(tx)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+		}
+		txs = append(txs, *tx)
 	}
-	ctx.JSON(http.StatusOK, gin.H{"transaction": tx})
+	ctx.JSON(http.StatusOK, gin.H{"transactions": txs})
 }
 
 func (th TransactionHandler) CreateTransaction(ctx *gin.Context) {
