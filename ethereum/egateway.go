@@ -53,20 +53,6 @@ func (eg *EthereumGateway) GetByTransactionHash(txHashString string) (*model.Tra
 		to = tx.To().Hex()
 	}
 
-	// Marshal the transaction and receipt to JSON
-	txJSON, err := tx.MarshalJSON()
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal transaction to JSON: %v", err)
-	}
-	receiptJSON, err := receipt.MarshalJSON()
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal receipt to JSON: %v", err)
-	}
-
-	// Print the JSON representations
-	fmt.Println("Transaction JSON:", string(txJSON))
-	fmt.Println("Receipt JSON:", string(receiptJSON))
-
 	// Create the transaction model
 	transaction := &model.Transaction{
 		TransactionHash:   tx.Hash().Hex(),
@@ -81,7 +67,5 @@ func (eg *EthereumGateway) GetByTransactionHash(txHashString string) (*model.Tra
 		Value:             tx.Value().String(),
 	}
 
-	// Print transaction details
-	fmt.Printf("Transaction: %v\n", transaction)
 	return transaction, nil
 }
