@@ -14,6 +14,8 @@ type IUserRepository interface {
 	FindById(userId uint) (*model.User, error)
 	FindByUsername(username string) (*model.User, error)
 	FindAll() ([]model.User, error)
+	FindUserTransactions(userID uint) ([]model.Transaction, error)
+	AddTransactionToUser(user model.User, tx model.Transaction) error
 }
 
 type UserRepository struct {
@@ -80,4 +82,26 @@ func (r *UserRepository) FindAll() ([]model.User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (r *UserRepository) FindUserTransactions(userID uint) ([]model.Transaction, error) {
+	var transactions []model.Transaction
+	err := r.Db.Table("transactions").
+		Select("transactions.*").
+		Joins("JOIN user_transactions ON user_transactions.transaction_id = transactions.id").
+		Where("user_transactions.user_id = ?", userID).
+		Find(&transactions).Error
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
+}
+
+func (r *UserRepository) AddTransactionToUser(user model.User, tx model.Transaction) error {
+	// Append transaction to user's transactions
+	if err := r.Db.Model(&user).Association("Transactions").Append(&tx); err != nil {
+		return err
+	}
+
+	return nil
 }

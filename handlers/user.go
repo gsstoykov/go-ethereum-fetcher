@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -133,4 +134,22 @@ func (uh UserHandler) FetchUsers(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"users": us})
+}
+
+func (uh UserHandler) FetchUserTransactions(ctx *gin.Context) {
+	username, _ := ctx.Get("username")
+
+	user, err := uh.ur.FindByUsername(fmt.Sprint(username))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	txs, err := uh.ur.FindUserTransactions(user.ID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"usertransactions": txs})
 }

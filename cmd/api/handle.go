@@ -29,12 +29,14 @@ func (hm *HandleManager) InitRouter() *gin.Engine {
 	userHandler := handlers.NewUserHandler(repository.NewUserRepository(hm.db))
 	transactionHandler := handlers.NewTransactionHandler(
 		repository.NewTransactionRepository(hm.db),
+		repository.NewUserRepository(hm.db),
 		egateway.NewEthereumGateway(hm.client),
 	)
 	// user routes
 	hm.router.GET("/users", userHandler.FetchUsers)
 	hm.router.POST("/user", userHandler.CreateUser)
 	hm.router.POST("/auth", userHandler.Authenticate)
+	hm.router.GET("/my", middleware.AuthenticateMiddleware(), userHandler.FetchUserTransactions)
 	// transaction routes
 	hm.router.GET("/transactions", transactionHandler.FetchTransactions)
 	hm.router.GET("/eth", middleware.AuthenticateMiddleware(), transactionHandler.FetchTransactionsList)

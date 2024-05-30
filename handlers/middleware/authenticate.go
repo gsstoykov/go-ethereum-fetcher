@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -37,7 +36,6 @@ func AuthenticateMiddleware() gin.HandlerFunc {
 			return []byte(os.Getenv("JWT_STRING")), nil
 		})
 		if err != nil {
-			fmt.Println(err)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Failed to parse token"})
 			c.Abort()
 			return

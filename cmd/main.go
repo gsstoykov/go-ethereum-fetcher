@@ -33,8 +33,7 @@ func main() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.Transaction{})
+	db.AutoMigrate(&model.User{}, &model.Transaction{})
 
 	ef := api.NewEthereumFetcher(db, client)
 	ef.Listen()
