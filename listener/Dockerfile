@@ -17,6 +17,4 @@ RUN go build \
     -tags netgo \
     -o contract-listener ./listener/cmd
 
-EXPOSE 8081
-
 CMD ["./contract-listener"]
