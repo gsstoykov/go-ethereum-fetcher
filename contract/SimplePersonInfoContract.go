@@ -1,7 +1,7 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package store
+package contract
 
 import (
 	"errors"
@@ -29,113 +29,113 @@ var (
 	_ = abi.ConvertType
 )
 
-// StoreMetaData contains all meta data concerning the Store contract.
-var StoreMetaData = &bind.MetaData{
+// ContractMetaData contains all meta data concerning the Contract contract.
+var ContractMetaData = &bind.MetaData{
 	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"personIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"newName\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newAge\",\"type\":\"uint256\"}],\"name\":\"PersonInfoUpdated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_personIndex\",\"type\":\"uint256\"}],\"name\":\"getPersonInfo\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getPersonsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"persons\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"age\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"_age\",\"type\":\"uint256\"}],\"name\":\"setPersonInfo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
-// StoreABI is the input ABI used to generate the binding from.
-// Deprecated: Use StoreMetaData.ABI instead.
-var StoreABI = StoreMetaData.ABI
+// ContractABI is the input ABI used to generate the binding from.
+// Deprecated: Use ContractMetaData.ABI instead.
+var ContractABI = ContractMetaData.ABI
 
-// Store is an auto generated Go binding around an Ethereum contract.
-type Store struct {
-	StoreCaller     // Read-only binding to the contract
-	StoreTransactor // Write-only binding to the contract
-	StoreFilterer   // Log filterer for contract events
+// Contract is an auto generated Go binding around an Ethereum contract.
+type Contract struct {
+	ContractCaller     // Read-only binding to the contract
+	ContractTransactor // Write-only binding to the contract
+	ContractFilterer   // Log filterer for contract events
 }
 
-// StoreCaller is an auto generated read-only Go binding around an Ethereum contract.
-type StoreCaller struct {
+// ContractCaller is an auto generated read-only Go binding around an Ethereum contract.
+type ContractCaller struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// StoreTransactor is an auto generated write-only Go binding around an Ethereum contract.
-type StoreTransactor struct {
+// ContractTransactor is an auto generated write-only Go binding around an Ethereum contract.
+type ContractTransactor struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// StoreFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
-type StoreFilterer struct {
+// ContractFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
+type ContractFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// StoreSession is an auto generated Go binding around an Ethereum contract,
+// ContractSession is an auto generated Go binding around an Ethereum contract,
 // with pre-set call and transact options.
-type StoreSession struct {
-	Contract     *Store            // Generic contract binding to set the session for
+type ContractSession struct {
+	Contract     *Contract         // Generic contract binding to set the session for
 	CallOpts     bind.CallOpts     // Call options to use throughout this session
 	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
 }
 
-// StoreCallerSession is an auto generated read-only Go binding around an Ethereum contract,
+// ContractCallerSession is an auto generated read-only Go binding around an Ethereum contract,
 // with pre-set call options.
-type StoreCallerSession struct {
-	Contract *StoreCaller  // Generic contract caller binding to set the session for
-	CallOpts bind.CallOpts // Call options to use throughout this session
+type ContractCallerSession struct {
+	Contract *ContractCaller // Generic contract caller binding to set the session for
+	CallOpts bind.CallOpts   // Call options to use throughout this session
 }
 
-// StoreTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+// ContractTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
 // with pre-set transact options.
-type StoreTransactorSession struct {
-	Contract     *StoreTransactor  // Generic contract transactor binding to set the session for
-	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
+type ContractTransactorSession struct {
+	Contract     *ContractTransactor // Generic contract transactor binding to set the session for
+	TransactOpts bind.TransactOpts   // Transaction auth options to use throughout this session
 }
 
-// StoreRaw is an auto generated low-level Go binding around an Ethereum contract.
-type StoreRaw struct {
-	Contract *Store // Generic contract binding to access the raw methods on
+// ContractRaw is an auto generated low-level Go binding around an Ethereum contract.
+type ContractRaw struct {
+	Contract *Contract // Generic contract binding to access the raw methods on
 }
 
-// StoreCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
-type StoreCallerRaw struct {
-	Contract *StoreCaller // Generic read-only contract binding to access the raw methods on
+// ContractCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+type ContractCallerRaw struct {
+	Contract *ContractCaller // Generic read-only contract binding to access the raw methods on
 }
 
-// StoreTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
-type StoreTransactorRaw struct {
-	Contract *StoreTransactor // Generic write-only contract binding to access the raw methods on
+// ContractTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+type ContractTransactorRaw struct {
+	Contract *ContractTransactor // Generic write-only contract binding to access the raw methods on
 }
 
-// NewStore creates a new instance of Store, bound to a specific deployed contract.
-func NewStore(address common.Address, backend bind.ContractBackend) (*Store, error) {
-	contract, err := bindStore(address, backend, backend, backend)
+// NewContract creates a new instance of Contract, bound to a specific deployed contract.
+func NewContract(address common.Address, backend bind.ContractBackend) (*Contract, error) {
+	contract, err := bindContract(address, backend, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &Store{StoreCaller: StoreCaller{contract: contract}, StoreTransactor: StoreTransactor{contract: contract}, StoreFilterer: StoreFilterer{contract: contract}}, nil
+	return &Contract{ContractCaller: ContractCaller{contract: contract}, ContractTransactor: ContractTransactor{contract: contract}, ContractFilterer: ContractFilterer{contract: contract}}, nil
 }
 
-// NewStoreCaller creates a new read-only instance of Store, bound to a specific deployed contract.
-func NewStoreCaller(address common.Address, caller bind.ContractCaller) (*StoreCaller, error) {
-	contract, err := bindStore(address, caller, nil, nil)
+// NewContractCaller creates a new read-only instance of Contract, bound to a specific deployed contract.
+func NewContractCaller(address common.Address, caller bind.ContractCaller) (*ContractCaller, error) {
+	contract, err := bindContract(address, caller, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &StoreCaller{contract: contract}, nil
+	return &ContractCaller{contract: contract}, nil
 }
 
-// NewStoreTransactor creates a new write-only instance of Store, bound to a specific deployed contract.
-func NewStoreTransactor(address common.Address, transactor bind.ContractTransactor) (*StoreTransactor, error) {
-	contract, err := bindStore(address, nil, transactor, nil)
+// NewContractTransactor creates a new write-only instance of Contract, bound to a specific deployed contract.
+func NewContractTransactor(address common.Address, transactor bind.ContractTransactor) (*ContractTransactor, error) {
+	contract, err := bindContract(address, nil, transactor, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &StoreTransactor{contract: contract}, nil
+	return &ContractTransactor{contract: contract}, nil
 }
 
-// NewStoreFilterer creates a new log filterer instance of Store, bound to a specific deployed contract.
-func NewStoreFilterer(address common.Address, filterer bind.ContractFilterer) (*StoreFilterer, error) {
-	contract, err := bindStore(address, nil, nil, filterer)
+// NewContractFilterer creates a new log filterer instance of Contract, bound to a specific deployed contract.
+func NewContractFilterer(address common.Address, filterer bind.ContractFilterer) (*ContractFilterer, error) {
+	contract, err := bindContract(address, nil, nil, filterer)
 	if err != nil {
 		return nil, err
 	}
-	return &StoreFilterer{contract: contract}, nil
+	return &ContractFilterer{contract: contract}, nil
 }
 
-// bindStore binds a generic wrapper to an already deployed contract.
-func bindStore(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
-	parsed, err := StoreMetaData.GetAbi()
+// bindContract binds a generic wrapper to an already deployed contract.
+func bindContract(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
+	parsed, err := ContractMetaData.GetAbi()
 	if err != nil {
 		return nil, err
 	}
@@ -146,46 +146,46 @@ func bindStore(address common.Address, caller bind.ContractCaller, transactor bi
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_Store *StoreRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
-	return _Store.Contract.StoreCaller.contract.Call(opts, result, method, params...)
+func (_Contract *ContractRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
+	return _Contract.Contract.ContractCaller.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
 // its default method if one is available.
-func (_Store *StoreRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Store.Contract.StoreTransactor.contract.Transfer(opts)
+func (_Contract *ContractRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Contract.Contract.ContractTransactor.contract.Transfer(opts)
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_Store *StoreRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _Store.Contract.StoreTransactor.contract.Transact(opts, method, params...)
+func (_Contract *ContractRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _Contract.Contract.ContractTransactor.contract.Transact(opts, method, params...)
 }
 
 // Call invokes the (constant) contract method with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_Store *StoreCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
-	return _Store.Contract.contract.Call(opts, result, method, params...)
+func (_Contract *ContractCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
+	return _Contract.Contract.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
 // its default method if one is available.
-func (_Store *StoreTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Store.Contract.contract.Transfer(opts)
+func (_Contract *ContractTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Contract.Contract.contract.Transfer(opts)
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_Store *StoreTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _Store.Contract.contract.Transact(opts, method, params...)
+func (_Contract *ContractTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _Contract.Contract.contract.Transact(opts, method, params...)
 }
 
 // GetPersonInfo is a free data retrieval call binding the contract method 0xd336ac80.
 //
 // Solidity: function getPersonInfo(uint256 _personIndex) view returns(string, uint256)
-func (_Store *StoreCaller) GetPersonInfo(opts *bind.CallOpts, _personIndex *big.Int) (string, *big.Int, error) {
+func (_Contract *ContractCaller) GetPersonInfo(opts *bind.CallOpts, _personIndex *big.Int) (string, *big.Int, error) {
 	var out []interface{}
-	err := _Store.contract.Call(opts, &out, "getPersonInfo", _personIndex)
+	err := _Contract.contract.Call(opts, &out, "getPersonInfo", _personIndex)
 
 	if err != nil {
 		return *new(string), *new(*big.Int), err
@@ -201,23 +201,23 @@ func (_Store *StoreCaller) GetPersonInfo(opts *bind.CallOpts, _personIndex *big.
 // GetPersonInfo is a free data retrieval call binding the contract method 0xd336ac80.
 //
 // Solidity: function getPersonInfo(uint256 _personIndex) view returns(string, uint256)
-func (_Store *StoreSession) GetPersonInfo(_personIndex *big.Int) (string, *big.Int, error) {
-	return _Store.Contract.GetPersonInfo(&_Store.CallOpts, _personIndex)
+func (_Contract *ContractSession) GetPersonInfo(_personIndex *big.Int) (string, *big.Int, error) {
+	return _Contract.Contract.GetPersonInfo(&_Contract.CallOpts, _personIndex)
 }
 
 // GetPersonInfo is a free data retrieval call binding the contract method 0xd336ac80.
 //
 // Solidity: function getPersonInfo(uint256 _personIndex) view returns(string, uint256)
-func (_Store *StoreCallerSession) GetPersonInfo(_personIndex *big.Int) (string, *big.Int, error) {
-	return _Store.Contract.GetPersonInfo(&_Store.CallOpts, _personIndex)
+func (_Contract *ContractCallerSession) GetPersonInfo(_personIndex *big.Int) (string, *big.Int, error) {
+	return _Contract.Contract.GetPersonInfo(&_Contract.CallOpts, _personIndex)
 }
 
 // GetPersonsCount is a free data retrieval call binding the contract method 0x8f97cff0.
 //
 // Solidity: function getPersonsCount() view returns(uint256)
-func (_Store *StoreCaller) GetPersonsCount(opts *bind.CallOpts) (*big.Int, error) {
+func (_Contract *ContractCaller) GetPersonsCount(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
-	err := _Store.contract.Call(opts, &out, "getPersonsCount")
+	err := _Contract.contract.Call(opts, &out, "getPersonsCount")
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -232,26 +232,26 @@ func (_Store *StoreCaller) GetPersonsCount(opts *bind.CallOpts) (*big.Int, error
 // GetPersonsCount is a free data retrieval call binding the contract method 0x8f97cff0.
 //
 // Solidity: function getPersonsCount() view returns(uint256)
-func (_Store *StoreSession) GetPersonsCount() (*big.Int, error) {
-	return _Store.Contract.GetPersonsCount(&_Store.CallOpts)
+func (_Contract *ContractSession) GetPersonsCount() (*big.Int, error) {
+	return _Contract.Contract.GetPersonsCount(&_Contract.CallOpts)
 }
 
 // GetPersonsCount is a free data retrieval call binding the contract method 0x8f97cff0.
 //
 // Solidity: function getPersonsCount() view returns(uint256)
-func (_Store *StoreCallerSession) GetPersonsCount() (*big.Int, error) {
-	return _Store.Contract.GetPersonsCount(&_Store.CallOpts)
+func (_Contract *ContractCallerSession) GetPersonsCount() (*big.Int, error) {
+	return _Contract.Contract.GetPersonsCount(&_Contract.CallOpts)
 }
 
 // Persons is a free data retrieval call binding the contract method 0xa2f9eac6.
 //
 // Solidity: function persons(uint256 ) view returns(string name, uint256 age)
-func (_Store *StoreCaller) Persons(opts *bind.CallOpts, arg0 *big.Int) (struct {
+func (_Contract *ContractCaller) Persons(opts *bind.CallOpts, arg0 *big.Int) (struct {
 	Name string
 	Age  *big.Int
 }, error) {
 	var out []interface{}
-	err := _Store.contract.Call(opts, &out, "persons", arg0)
+	err := _Contract.contract.Call(opts, &out, "persons", arg0)
 
 	outstruct := new(struct {
 		Name string
@@ -271,47 +271,47 @@ func (_Store *StoreCaller) Persons(opts *bind.CallOpts, arg0 *big.Int) (struct {
 // Persons is a free data retrieval call binding the contract method 0xa2f9eac6.
 //
 // Solidity: function persons(uint256 ) view returns(string name, uint256 age)
-func (_Store *StoreSession) Persons(arg0 *big.Int) (struct {
+func (_Contract *ContractSession) Persons(arg0 *big.Int) (struct {
 	Name string
 	Age  *big.Int
 }, error) {
-	return _Store.Contract.Persons(&_Store.CallOpts, arg0)
+	return _Contract.Contract.Persons(&_Contract.CallOpts, arg0)
 }
 
 // Persons is a free data retrieval call binding the contract method 0xa2f9eac6.
 //
 // Solidity: function persons(uint256 ) view returns(string name, uint256 age)
-func (_Store *StoreCallerSession) Persons(arg0 *big.Int) (struct {
+func (_Contract *ContractCallerSession) Persons(arg0 *big.Int) (struct {
 	Name string
 	Age  *big.Int
 }, error) {
-	return _Store.Contract.Persons(&_Store.CallOpts, arg0)
+	return _Contract.Contract.Persons(&_Contract.CallOpts, arg0)
 }
 
 // SetPersonInfo is a paid mutator transaction binding the contract method 0x33f3b2a4.
 //
 // Solidity: function setPersonInfo(string _name, uint256 _age) returns()
-func (_Store *StoreTransactor) SetPersonInfo(opts *bind.TransactOpts, _name string, _age *big.Int) (*types.Transaction, error) {
-	return _Store.contract.Transact(opts, "setPersonInfo", _name, _age)
+func (_Contract *ContractTransactor) SetPersonInfo(opts *bind.TransactOpts, _name string, _age *big.Int) (*types.Transaction, error) {
+	return _Contract.contract.Transact(opts, "setPersonInfo", _name, _age)
 }
 
 // SetPersonInfo is a paid mutator transaction binding the contract method 0x33f3b2a4.
 //
 // Solidity: function setPersonInfo(string _name, uint256 _age) returns()
-func (_Store *StoreSession) SetPersonInfo(_name string, _age *big.Int) (*types.Transaction, error) {
-	return _Store.Contract.SetPersonInfo(&_Store.TransactOpts, _name, _age)
+func (_Contract *ContractSession) SetPersonInfo(_name string, _age *big.Int) (*types.Transaction, error) {
+	return _Contract.Contract.SetPersonInfo(&_Contract.TransactOpts, _name, _age)
 }
 
 // SetPersonInfo is a paid mutator transaction binding the contract method 0x33f3b2a4.
 //
 // Solidity: function setPersonInfo(string _name, uint256 _age) returns()
-func (_Store *StoreTransactorSession) SetPersonInfo(_name string, _age *big.Int) (*types.Transaction, error) {
-	return _Store.Contract.SetPersonInfo(&_Store.TransactOpts, _name, _age)
+func (_Contract *ContractTransactorSession) SetPersonInfo(_name string, _age *big.Int) (*types.Transaction, error) {
+	return _Contract.Contract.SetPersonInfo(&_Contract.TransactOpts, _name, _age)
 }
 
-// StorePersonInfoUpdatedIterator is returned from FilterPersonInfoUpdated and is used to iterate over the raw logs and unpacked data for PersonInfoUpdated events raised by the Store contract.
-type StorePersonInfoUpdatedIterator struct {
-	Event *StorePersonInfoUpdated // Event containing the contract specifics and raw log
+// ContractPersonInfoUpdatedIterator is returned from FilterPersonInfoUpdated and is used to iterate over the raw logs and unpacked data for PersonInfoUpdated events raised by the Contract contract.
+type ContractPersonInfoUpdatedIterator struct {
+	Event *ContractPersonInfoUpdated // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -325,7 +325,7 @@ type StorePersonInfoUpdatedIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *StorePersonInfoUpdatedIterator) Next() bool {
+func (it *ContractPersonInfoUpdatedIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -334,7 +334,7 @@ func (it *StorePersonInfoUpdatedIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(StorePersonInfoUpdated)
+			it.Event = new(ContractPersonInfoUpdated)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -349,7 +349,7 @@ func (it *StorePersonInfoUpdatedIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(StorePersonInfoUpdated)
+		it.Event = new(ContractPersonInfoUpdated)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -365,19 +365,19 @@ func (it *StorePersonInfoUpdatedIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *StorePersonInfoUpdatedIterator) Error() error {
+func (it *ContractPersonInfoUpdatedIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *StorePersonInfoUpdatedIterator) Close() error {
+func (it *ContractPersonInfoUpdatedIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// StorePersonInfoUpdated represents a PersonInfoUpdated event raised by the Store contract.
-type StorePersonInfoUpdated struct {
+// ContractPersonInfoUpdated represents a PersonInfoUpdated event raised by the Contract contract.
+type ContractPersonInfoUpdated struct {
 	PersonIndex *big.Int
 	NewName     string
 	NewAge      *big.Int
@@ -387,31 +387,31 @@ type StorePersonInfoUpdated struct {
 // FilterPersonInfoUpdated is a free log retrieval operation binding the contract event 0x96fb71ab58332a1b713976cc33c58781380e987f4cf4f8b2ef62be13218fec32.
 //
 // Solidity: event PersonInfoUpdated(uint256 indexed personIndex, string newName, uint256 newAge)
-func (_Store *StoreFilterer) FilterPersonInfoUpdated(opts *bind.FilterOpts, personIndex []*big.Int) (*StorePersonInfoUpdatedIterator, error) {
+func (_Contract *ContractFilterer) FilterPersonInfoUpdated(opts *bind.FilterOpts, personIndex []*big.Int) (*ContractPersonInfoUpdatedIterator, error) {
 
 	var personIndexRule []interface{}
 	for _, personIndexItem := range personIndex {
 		personIndexRule = append(personIndexRule, personIndexItem)
 	}
 
-	logs, sub, err := _Store.contract.FilterLogs(opts, "PersonInfoUpdated", personIndexRule)
+	logs, sub, err := _Contract.contract.FilterLogs(opts, "PersonInfoUpdated", personIndexRule)
 	if err != nil {
 		return nil, err
 	}
-	return &StorePersonInfoUpdatedIterator{contract: _Store.contract, event: "PersonInfoUpdated", logs: logs, sub: sub}, nil
+	return &ContractPersonInfoUpdatedIterator{contract: _Contract.contract, event: "PersonInfoUpdated", logs: logs, sub: sub}, nil
 }
 
 // WatchPersonInfoUpdated is a free log subscription operation binding the contract event 0x96fb71ab58332a1b713976cc33c58781380e987f4cf4f8b2ef62be13218fec32.
 //
 // Solidity: event PersonInfoUpdated(uint256 indexed personIndex, string newName, uint256 newAge)
-func (_Store *StoreFilterer) WatchPersonInfoUpdated(opts *bind.WatchOpts, sink chan<- *StorePersonInfoUpdated, personIndex []*big.Int) (event.Subscription, error) {
+func (_Contract *ContractFilterer) WatchPersonInfoUpdated(opts *bind.WatchOpts, sink chan<- *ContractPersonInfoUpdated, personIndex []*big.Int) (event.Subscription, error) {
 
 	var personIndexRule []interface{}
 	for _, personIndexItem := range personIndex {
 		personIndexRule = append(personIndexRule, personIndexItem)
 	}
 
-	logs, sub, err := _Store.contract.WatchLogs(opts, "PersonInfoUpdated", personIndexRule)
+	logs, sub, err := _Contract.contract.WatchLogs(opts, "PersonInfoUpdated", personIndexRule)
 	if err != nil {
 		return nil, err
 	}
@@ -421,8 +421,8 @@ func (_Store *StoreFilterer) WatchPersonInfoUpdated(opts *bind.WatchOpts, sink c
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(StorePersonInfoUpdated)
-				if err := _Store.contract.UnpackLog(event, "PersonInfoUpdated", log); err != nil {
+				event := new(ContractPersonInfoUpdated)
+				if err := _Contract.contract.UnpackLog(event, "PersonInfoUpdated", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -446,9 +446,9 @@ func (_Store *StoreFilterer) WatchPersonInfoUpdated(opts *bind.WatchOpts, sink c
 // ParsePersonInfoUpdated is a log parse operation binding the contract event 0x96fb71ab58332a1b713976cc33c58781380e987f4cf4f8b2ef62be13218fec32.
 //
 // Solidity: event PersonInfoUpdated(uint256 indexed personIndex, string newName, uint256 newAge)
-func (_Store *StoreFilterer) ParsePersonInfoUpdated(log types.Log) (*StorePersonInfoUpdated, error) {
-	event := new(StorePersonInfoUpdated)
-	if err := _Store.contract.UnpackLog(event, "PersonInfoUpdated", log); err != nil {
+func (_Contract *ContractFilterer) ParsePersonInfoUpdated(log types.Log) (*ContractPersonInfoUpdated, error) {
+	event := new(ContractPersonInfoUpdated)
+	if err := _Contract.contract.UnpackLog(event, "PersonInfoUpdated", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
