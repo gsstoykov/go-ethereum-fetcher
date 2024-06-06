@@ -7,7 +7,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/gsstoykov/go-ethereum-fetcher/handlers"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/handlers"
 )
 
 // AuthenticateMiddleware is a middleware function for JWT token authentication

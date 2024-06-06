@@ -3,7 +3,7 @@ package repository
 import (
 	"errors"
 
-	"github.com/gsstoykov/go-ethereum-fetcher/model"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/model"
 	"gorm.io/gorm"
 )
 

@@ -9,13 +9,14 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY . .
+COPY listener/ ./listener/
+COPY .env .
 
 RUN go build \
     -ldflags="-linkmode external -extldflags -static" \
     -tags netgo \
-    -o api-go ./cmd
+    -o contract-listener ./listener/cmd
 
-EXPOSE 8080
+EXPOSE 8081
 
-CMD ["./api-go"]
+CMD ["./contract-listener"]

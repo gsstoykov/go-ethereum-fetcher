@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/gsstoykov/go-ethereum-fetcher/cmd/api"
-	"github.com/gsstoykov/go-ethereum-fetcher/model"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/cmd/api"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/model"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

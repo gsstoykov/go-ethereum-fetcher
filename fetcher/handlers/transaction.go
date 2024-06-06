@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	egateway "github.com/gsstoykov/go-ethereum-fetcher/ethereum"
-	"github.com/gsstoykov/go-ethereum-fetcher/model"
-	"github.com/gsstoykov/go-ethereum-fetcher/repository"
+	egateway "github.com/gsstoykov/go-ethereum-fetcher/fetcher/ethereum"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/model"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/repository"
 )
 
 type TransactionHandler struct {

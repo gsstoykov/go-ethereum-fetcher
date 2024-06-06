@@ -3,10 +3,10 @@ package api
 import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
-	egateway "github.com/gsstoykov/go-ethereum-fetcher/ethereum"
-	"github.com/gsstoykov/go-ethereum-fetcher/handlers"
-	"github.com/gsstoykov/go-ethereum-fetcher/handlers/middleware"
-	"github.com/gsstoykov/go-ethereum-fetcher/repository"
+	egateway "github.com/gsstoykov/go-ethereum-fetcher/fetcher/ethereum"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/handlers"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/handlers/middleware"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/repository"
 	"gorm.io/gorm"
 )
 

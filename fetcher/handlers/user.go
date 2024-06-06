@@ -8,8 +8,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/gsstoykov/go-ethereum-fetcher/model"
-	"github.com/gsstoykov/go-ethereum-fetcher/repository"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/model"
+	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
