@@ -13,8 +13,7 @@ import (
 )
 
 func main() {
-	time.Sleep(600 * time.Second)
-	err := godotenv.Load("../.env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("error loading .env file: %v", err)
 		panic(err)
@@ -36,4 +35,6 @@ func main() {
 
 	fmt.Println(db)
 	fmt.Println(client)
+
+	time.Sleep(time.Second * 100)
 }
