@@ -36,6 +36,7 @@ func (hm *HandleManager) InitRouter() *gin.Engine {
 	)
 	personHandler := chandler.NewPersonHandler(
 		crepo.NewPersonRepository(hm.db),
+		hm.client,
 	)
 	// user routes
 	hm.router.GET("/users", userHandler.FetchUsers)
