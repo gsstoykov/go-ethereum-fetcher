@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/ethclient"
+	cmodel "github.com/gsstoykov/go-ethereum-fetcher/contract/model"
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/cmd/api"
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/model"
 	"github.com/joho/godotenv"
@@ -33,7 +34,7 @@ func main() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&model.User{}, &model.Transaction{})
+	db.AutoMigrate(&model.User{}, &model.Transaction{}, &cmodel.Person{})
 
 	ef := api.NewEthereumFetcher(db, client)
 	ef.Listen()

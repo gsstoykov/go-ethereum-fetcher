@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
+	chandler "github.com/gsstoykov/go-ethereum-fetcher/contract/handler"
+	crepo "github.com/gsstoykov/go-ethereum-fetcher/contract/repository"
 	egateway "github.com/gsstoykov/go-ethereum-fetcher/fetcher/ethereum"
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/handlers"
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/handlers/middleware"
@@ -32,6 +34,9 @@ func (hm *HandleManager) InitRouter() *gin.Engine {
 		repository.NewUserRepository(hm.db),
 		egateway.NewEthereumGateway(hm.client),
 	)
+	personHandler := chandler.NewPersonHandler(
+		crepo.NewPersonRepository(hm.db),
+	)
 	// user routes
 	hm.router.GET("/users", userHandler.FetchUsers)
 	hm.router.POST("/user", userHandler.CreateUser)
@@ -40,5 +45,8 @@ func (hm *HandleManager) InitRouter() *gin.Engine {
 	// transaction routes
 	hm.router.GET("/transactions", transactionHandler.FetchTransactions)
 	hm.router.GET("/eth", middleware.AuthenticateMiddleware(), transactionHandler.FetchTransactionsList)
+	// person routes
+	hm.router.POST("/savePerson", personHandler.SavePerson)
+	hm.router.GET("/listPeople", personHandler.ListPeople)
 	return hm.router
 }

@@ -11,6 +11,7 @@ RUN go mod download
 
 COPY fetcher/ ./fetcher/
 COPY .env .
+COPY contract/ ./contract/
 
 RUN go build \
     -ldflags="-linkmode external -extldflags -static" \

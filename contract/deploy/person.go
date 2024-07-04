@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/joho/godotenv"
 
-	c "github.com/gsstoykov/go-ethereum-fetcher/contract"
+	"github.com/gsstoykov/go-ethereum-fetcher/contract"
 )
 
 func main() {
@@ -58,7 +58,7 @@ func main() {
 	auth.GasLimit = uint64(3000000) // in units
 	auth.GasPrice = gasPrice
 
-	address, tx, instance, err := c.DeploySimplePersonInfoContract(auth, client)
+	address, tx, instance, err := contract.DeploySimplePersonInfoContract(auth, client)
 	if err != nil {
 		log.Fatal(err)
 	}
