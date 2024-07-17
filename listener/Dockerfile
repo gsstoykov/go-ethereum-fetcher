@@ -11,6 +11,7 @@ RUN go mod download
 
 COPY listener/ ./listener/
 COPY .env .
+COPY contract/ ./contract/
 
 RUN go build \
     -ldflags="-linkmode external -extldflags -static" \

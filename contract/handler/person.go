@@ -33,7 +33,6 @@ func (ph PersonHandler) SavePerson(ctx *gin.Context) {
 	}
 
 	contractAddressStr := os.Getenv("CONTRACT_ADDRESS")
-
 	contractAddress := common.HexToAddress(contractAddressStr)
 	instance, err := contract.NewSimplePersonInfoContract(contractAddress, ph.client)
 	if err != nil {
