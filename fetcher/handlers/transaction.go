@@ -68,7 +68,7 @@ func (th TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 			}
 		}
 		if user != nil {
-			err = th.ur.AddTransactionToUser(*user, *tx)
+			err = th.ur.AddTransactionToUser(user, tx)
 			if err != nil {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			}

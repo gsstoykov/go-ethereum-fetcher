@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/model"
 	"gorm.io/gorm"
@@ -26,7 +27,7 @@ func NewTransactionRepository(db *gorm.DB) ITransactionRepository {
 
 func (r *TransactionRepository) Create(transaction *model.Transaction) (*model.Transaction, error) {
 	if err := r.Db.Create(transaction).Error; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not create transaction: %w", err)
 	}
 	return transaction, nil
 }
@@ -34,35 +35,44 @@ func (r *TransactionRepository) Create(transaction *model.Transaction) (*model.T
 func (r *TransactionRepository) Update(transaction *model.Transaction) (*model.Transaction, error) {
 	existingTransaction, err := r.FindById(transaction.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not find transaction: %w", err)
 	}
 	if existingTransaction == nil {
 		return nil, errors.New("transaction not found")
 	}
 
-	// Update transaction attributes
+	// Update the fields of the existing transaction
 
-	// Perform the update operation
 	if err := r.Db.Save(existingTransaction).Error; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not update transaction: %w", err)
 	}
 	return existingTransaction, nil
 }
 
 func (r *TransactionRepository) Delete(transactionId uint) (*model.Transaction, error) {
-	var transaction *model.Transaction
-	if err := r.Db.Where("id = ?", transactionId).Delete(transaction).Error; err != nil {
-		return nil, err
+	transaction, err := r.FindById(transactionId)
+	if err != nil {
+		return nil, fmt.Errorf("could not find transaction: %w", err)
+	}
+	if transaction == nil {
+		return nil, errors.New("transaction not found")
+	}
+
+	if err := r.Db.Delete(transaction).Error; err != nil {
+		return nil, fmt.Errorf("could not delete transaction: %w", err)
 	}
 	return transaction, nil
 }
 
 func (r *TransactionRepository) FindById(transactionId uint) (*model.Transaction, error) {
-	var transaction *model.Transaction
-	if err := r.Db.Where("id = ?", transactionId).Error; err != nil {
-		return nil, err
+	var transaction model.Transaction
+	if err := r.Db.First(&transaction, transactionId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil // No transaction found, return nil
+		}
+		return nil, fmt.Errorf("could not find transaction by id: %w", err)
 	}
-	return transaction, nil
+	return &transaction, nil
 }
 
 func (r *TransactionRepository) FindByTransactionHash(transactionHash string) (*model.Transaction, error) {
@@ -71,7 +81,7 @@ func (r *TransactionRepository) FindByTransactionHash(transactionHash string) (*
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil // No transaction found, return nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("could not find transaction by hash: %w", err)
 	}
 	return &transaction, nil
 }
@@ -79,7 +89,7 @@ func (r *TransactionRepository) FindByTransactionHash(transactionHash string) (*
 func (r *TransactionRepository) FindAll() ([]model.Transaction, error) {
 	var transactions []model.Transaction
 	if err := r.Db.Find(&transactions).Error; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not find all transactions: %w", err)
 	}
 	return transactions, nil
 }
