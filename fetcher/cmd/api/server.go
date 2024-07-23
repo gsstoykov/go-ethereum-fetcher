@@ -13,8 +13,8 @@ type EthereumFetcher struct {
 	server *http.Server
 }
 
-func NewEthereumFetcher(db *gorm.DB, client *ethclient.Client) *EthereumFetcher {
-	hm := NewHandleManager(db, client)
+func NewEthereumFetcher(db *gorm.DB, client *ethclient.Client, ethurl string) *EthereumFetcher {
+	hm := NewHandleManager(db, client, ethurl)
 	return &EthereumFetcher{
 		server: &http.Server{
 			Addr:           ":" + os.Getenv("API_PORT"),

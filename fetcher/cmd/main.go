@@ -36,6 +36,6 @@ func main() {
 
 	db.AutoMigrate(&model.User{}, &model.Transaction{}, &cmodel.Person{})
 
-	ef := api.NewEthereumFetcher(db, client)
+	ef := api.NewEthereumFetcher(db, client, ethurl)
 	ef.Listen()
 }

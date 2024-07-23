@@ -16,13 +16,15 @@ type HandleManager struct {
 	router *gin.Engine
 	client *ethclient.Client
 	db     *gorm.DB
+	ethurl string
 }
 
-func NewHandleManager(db *gorm.DB, client *ethclient.Client) *HandleManager {
+func NewHandleManager(db *gorm.DB, client *ethclient.Client, ethurl string) *HandleManager {
 	return &HandleManager{
 		router: gin.Default(),
 		client: client,
 		db:     db,
+		ethurl: ethurl,
 	}
 }
 
@@ -32,7 +34,7 @@ func (hm *HandleManager) InitRouter() *gin.Engine {
 	transactionHandler := handlers.NewTransactionHandler(
 		repository.NewTransactionRepository(hm.db),
 		repository.NewUserRepository(hm.db),
-		egateway.NewEthereumGateway(hm.client),
+		egateway.NewEthereumGateway(hm.ethurl),
 	)
 	personHandler := chandler.NewPersonHandler(
 		crepo.NewPersonRepository(hm.db),
