@@ -2,14 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
-	crepo "github.com/gsstoykov/go-ethereum-fetcher/contract/repository"
-	"github.com/gsstoykov/go-ethereum-fetcher/listener/ws"
+	"github.com/gsstoykov/go-ethereum-fetcher/contract/repository"
+	"github.com/gsstoykov/go-ethereum-fetcher/listener"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -36,14 +34,8 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(db)
-	fmt.Println(client)
-
-	personRepository := crepo.NewPersonRepository(db)
+	personRepository := repository.NewPersonRepository(db)
 
 	ctx, _ := context.WithCancel(context.Background())
-	var el ws.EventListener
-	el.Subscirbe(ctx, client, personRepository)
-
-	time.Sleep(time.Second * 100)
+	listener.SubPIC(ctx, client, personRepository)
 }

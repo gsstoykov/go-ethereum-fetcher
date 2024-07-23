@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
-	"fmt"
 	"log"
 	"math/big"
 	"os"
@@ -18,7 +17,6 @@ func BuildTransactor(client *ethclient.Client) (*bind.TransactOpts, error) {
 	pkeystr := os.Getenv("PRIVATE_KEY")
 
 	if client == nil {
-		fmt.Println("client is nil")
 		return nil, errors.New("client is nil")
 	}
 
