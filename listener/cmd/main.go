@@ -54,6 +54,7 @@ func main() {
 	defer cancel() // Ensure the context is cancelled when main exits
 
 	// Start the listener
+	// Could improve to listen multiple contracts in chans
 	if err := listener.SubPIC(ctx, client, personRepository); err != nil {
 		fmt.Printf("Error in listener: %v\n", err)
 		os.Exit(1)

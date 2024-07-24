@@ -21,37 +21,43 @@ type EthereumGateway struct {
 	client     *http.Client
 }
 
-// NewEthereumGateway creates a new instance of EthereumGateway.
+// NewEthereumGateway creates a new instance of EthereumGateway with the specified Ethereum node URL.
 func NewEthereumGateway(ethNodeURL string) IEthereumGateway {
 	return &EthereumGateway{
 		ethNodeURL: ethNodeURL,
-		client:     &http.Client{},
+		client:     &http.Client{}, // Initialize HTTP client
 	}
 }
 
 // GetByTransactionHash retrieves a transaction by its hash and returns a model.Transaction.
 func (eg *EthereumGateway) GetByTransactionHash(txHashString string) (*model.Transaction, error) {
-	// Fetch transaction details and receipt
+	// Fetch transaction and receipt data
 	tx, receipt, err := eg.fetchTransactionData(txHashString)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch transaction data: %w", err)
 	}
 
-	// Build and return the transaction model
-	transaction := eg.buildTransactionModel(tx, receipt)
+	// Build transaction model from fetched data
+	transaction, err := eg.buildTransactionModel(tx, receipt)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build transaction model: %w", err)
+	}
+
 	return transaction, nil
 }
 
-// fetchTransactionData retrieves transaction and receipt data by hash.
+// fetchTransactionData retrieves both transaction and receipt data by hash.
 func (eg *EthereumGateway) fetchTransactionData(txHashString string) (map[string]interface{}, map[string]interface{}, error) {
+	// Get transaction data by hash
 	tx, err := eg.getTransactionByHash(txHashString)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("error fetching transaction by hash: %w", err)
 	}
 
+	// Get transaction receipt by hash
 	receipt, err := eg.getTransactionReceipt(txHashString)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("error fetching transaction receipt: %w", err)
 	}
 
 	return tx, receipt, nil
@@ -59,10 +65,6 @@ func (eg *EthereumGateway) fetchTransactionData(txHashString string) (map[string
 
 // getTransactionByHash retrieves a transaction by its hash using JSON-RPC.
 func (eg *EthereumGateway) getTransactionByHash(hash string) (map[string]interface{}, error) {
-	var response struct {
-		Result map[string]interface{} `json:"result"`
-	}
-
 	payload := map[string]interface{}{
 		"id":      1,
 		"jsonrpc": "2.0",
@@ -70,30 +72,10 @@ func (eg *EthereumGateway) getTransactionByHash(hash string) (map[string]interfa
 		"params":  []interface{}{hash},
 	}
 
-	requestBody, err := json.Marshal(payload)
+	// Send JSON-RPC request
+	response, err := eg.sendRequest(payload)
 	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", eg.ethNodeURL, bytes.NewBuffer(requestBody))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := eg.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code while fetching transaction: %d", resp.StatusCode)
-	}
-
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&response); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error sending request to get transaction: %w", err)
 	}
 
 	return response.Result, nil
@@ -101,10 +83,6 @@ func (eg *EthereumGateway) getTransactionByHash(hash string) (map[string]interfa
 
 // getTransactionReceipt retrieves a transaction receipt by its hash using JSON-RPC.
 func (eg *EthereumGateway) getTransactionReceipt(hash string) (map[string]interface{}, error) {
-	var response struct {
-		Result map[string]interface{} `json:"result"`
-	}
-
 	payload := map[string]interface{}{
 		"id":      1,
 		"jsonrpc": "2.0",
@@ -112,53 +90,86 @@ func (eg *EthereumGateway) getTransactionReceipt(hash string) (map[string]interf
 		"params":  []interface{}{hash},
 	}
 
-	requestBody, err := json.Marshal(payload)
+	// Send JSON-RPC request
+	response, err := eg.sendRequest(payload)
 	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", eg.ethNodeURL, bytes.NewBuffer(requestBody))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := eg.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code while fetching transaction receipt: %d", resp.StatusCode)
-	}
-
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&response); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error sending request to get transaction receipt: %w", err)
 	}
 
 	return response.Result, nil
 }
 
-// buildTransactionModel creates a model.Transaction instance from the transaction and receipt data.
-func (eg *EthereumGateway) buildTransactionModel(tx map[string]interface{}, receipt map[string]interface{}) *model.Transaction {
-	to := ""
-	if tx["to"] != nil {
-		to = tx["to"].(string)
+// sendRequest sends a JSON-RPC request and returns the response.
+func (eg *EthereumGateway) sendRequest(payload map[string]interface{}) (*jsonResponse, error) {
+	// Marshal payload to JSON
+	requestBody, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("error marshalling request payload: %w", err)
 	}
 
-	// Extract from address directly from transaction
-	from := tx["from"].(string)
+	// Create HTTP POST request
+	req, err := http.NewRequest("POST", eg.ethNodeURL, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return nil, fmt.Errorf("error creating HTTP request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// Execute HTTP request
+	resp, err := eg.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error executing HTTP request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Check for unexpected status code
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	// Decode response body
+	var response jsonResponse
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&response); err != nil {
+		return nil, fmt.Errorf("error decoding response body: %w", err)
+	}
+
+	return &response, nil
+}
+
+// jsonResponse defines the structure of the JSON-RPC response.
+type jsonResponse struct {
+	Result map[string]interface{} `json:"result"`
+}
+
+// buildTransactionModel creates a model.Transaction instance from the transaction and receipt data.
+func (eg *EthereumGateway) buildTransactionModel(tx map[string]interface{}, receipt map[string]interface{}) (*model.Transaction, error) {
+	// Extract 'to' address from transaction data
+	to, ok := tx["to"].(string)
+	if !ok {
+		to = ""
+	}
+
+	// Extract 'from' address from transaction data
+	from, ok := tx["from"].(string)
+	if !ok {
+		return nil, fmt.Errorf("invalid 'from' address in transaction data")
+	}
 
 	// Convert block number and status to integers
-	blockNumber, _ := strconv.ParseUint(receipt["blockNumber"].(string), 0, 64)
-	status, _ := strconv.ParseUint(receipt["status"].(string), 0, 64)
+	blockNumber, err := strconv.ParseUint(receipt["blockNumber"].(string), 0, 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing block number: %w", err)
+	}
 
-	// Handle nil contract address
-	contractAddress := ""
-	if receipt["contractAddress"] != nil {
-		contractAddress = receipt["contractAddress"].(string)
+	status, err := strconv.ParseUint(receipt["status"].(string), 0, 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing status: %w", err)
+	}
+
+	// Extract contract address from receipt data
+	contractAddress, ok := receipt["contractAddress"].(string)
+	if !ok {
+		contractAddress = ""
 	}
 
 	return &model.Transaction{
@@ -172,5 +183,5 @@ func (eg *EthereumGateway) buildTransactionModel(tx map[string]interface{}, rece
 		LogsCount:         len(receipt["logs"].([]interface{})),
 		Input:             tx["input"].(string),
 		Value:             tx["value"].(string),
-	}
+	}, nil
 }
