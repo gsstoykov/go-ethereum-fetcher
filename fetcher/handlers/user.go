@@ -13,16 +13,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// UserHandler handles user-related requests.
 type UserHandler struct {
 	ur        repository.IUserRepository
 	jwtSecret []byte
 }
 
+// JWTClaims represents the JWT claims.
 type JWTClaims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
+// NewUserHandler creates a new UserHandler instance.
 func NewUserHandler(ur repository.IUserRepository) *UserHandler {
 	return &UserHandler{
 		ur:        ur,
@@ -30,15 +33,20 @@ func NewUserHandler(ur repository.IUserRepository) *UserHandler {
 	}
 }
 
-func (uh UserHandler) CreateUser(ctx *gin.Context) {
+// CreateUser handles the creation of a new user.
+// It binds the JSON request to the user model, hashes the password, and stores the user in the database.
+func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 	var u model.User
 	if err := ctx.ShouldBindJSON(&u); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to bind JSON: %v\n", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input: " + err.Error()})
 		return
 	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to hash password: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password: " + err.Error()})
 		return
 	}
 
@@ -47,107 +55,116 @@ func (uh UserHandler) CreateUser(ctx *gin.Context) {
 		Password: string(hash),
 	})
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to create user: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user: " + err.Error()})
 		return
 	}
 
+	// Respond with the created user
 	ctx.JSON(http.StatusCreated, gin.H{"user": cu})
 }
 
-func (u *UserHandler) Authenticate(c *gin.Context) {
+// Authenticate handles user authentication.
+// It verifies the username and password, generates a JWT token, and returns it to the client.
+func (uh *UserHandler) Authenticate(ctx *gin.Context) {
 	var user model.User
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid credentials"})
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		fmt.Printf("Failed to bind JSON: %v\n", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid credentials"})
 		return
 	}
 
 	// Lookup the user in the database
-	storedUser, err := u.ur.FindByUsername(user.Username)
+	storedUser, err := uh.ur.FindByUsername(user.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to authenticate"})
+		fmt.Printf("Failed to find user by username: %v\n", err)
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 
 	// Verify the password
 	if err := bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(user.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		fmt.Printf("Password mismatch for user %s: %v\n", user.Username, err)
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 
 	// Generate JWT token
-	token, err := u.generateToken(storedUser.Username, time.Hour*12)
+	token, err := uh.generateToken(storedUser.Username, time.Hour*12)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		fmt.Printf("Failed to generate token for user %s: %v\n", user.Username, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
+
+	// Log successful authentication
+	fmt.Printf("User %s authenticated successfully\n", user.Username)
 
 	// Set token in the response header
-	c.Header("Authorization", "Bearer "+token)
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	ctx.Header("Authorization", "Bearer "+token)
+	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-func (u *UserHandler) generateToken(username string, expiration time.Duration) (string, error) {
-	// Create JWT claims
-	claims := u.createJWTClaims(username, expiration)
-
-	// Generate token
-	tokenString, err := u.signToken(claims)
-	if err != nil {
-		return "", err
-	}
-	return tokenString, nil
+// generateToken generates a JWT token for a user.
+func (uh *UserHandler) generateToken(username string, expiration time.Duration) (string, error) {
+	claims := uh.createJWTClaims(username, expiration)
+	return uh.signToken(claims)
 }
 
-func (u *UserHandler) createJWTClaims(username string, expiration time.Duration) *JWTClaims {
-	// Create standard claims
-	standardClaims := jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(expiration).Unix(),
-		IssuedAt:  time.Now().Unix(),
+// createJWTClaims creates JWT claims for a user.
+func (uh *UserHandler) createJWTClaims(username string, expiration time.Duration) *JWTClaims {
+	return &JWTClaims{
+		Username: username,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(expiration).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
 	}
-
-	// Create custom claims
-	claims := &JWTClaims{
-		Username:       username,
-		StandardClaims: standardClaims,
-	}
-
-	return claims
 }
 
-func (u *UserHandler) signToken(claims *JWTClaims) (string, error) {
-	// Generate token with claims
+// signToken signs the JWT claims with the secret.
+func (uh *UserHandler) signToken(claims *JWTClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Sign the token with the JWT secret
-	tokenString, err := token.SignedString(u.jwtSecret)
+	tokenString, err := token.SignedString(uh.jwtSecret)
 	if err != nil {
 		return "", err
 	}
 	return tokenString, nil
 }
 
-func (uh UserHandler) FetchUsers(ctx *gin.Context) {
-	var us []model.User
-	us, err := uh.ur.FindAll()
+// FetchUsers handles fetching all users.
+// It retrieves all users from the database and returns them in the response.
+func (uh *UserHandler) FetchUsers(ctx *gin.Context) {
+	users, err := uh.ur.FindAll()
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to fetch users: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users: " + err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"users": us})
+	ctx.JSON(http.StatusOK, gin.H{"users": users})
 }
 
-func (uh UserHandler) FetchUserTransactions(ctx *gin.Context) {
-	username, _ := ctx.Get("username")
+// FetchUserTransactions handles fetching transactions for a specific user.
+// It retrieves the transactions associated with the authenticated user and returns them in the response.
+func (uh *UserHandler) FetchUserTransactions(ctx *gin.Context) {
+	username, exists := ctx.Get("username")
+	if !exists {
+		fmt.Printf("Unauthorized request\n")
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 
 	user, err := uh.ur.FindByUsername(fmt.Sprint(username))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to find user by username: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user: " + err.Error()})
 		return
 	}
 
 	txs, err := uh.ur.FindUserTransactions(user.ID)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to fetch transactions for user %s: %v\n", user.Username, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions: " + err.Error()})
 		return
 	}
 

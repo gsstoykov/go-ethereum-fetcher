@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// HandleManager manages the setup and initialization of routes and handlers.
 type HandleManager struct {
 	router *gin.Engine
 	client *ethclient.Client
@@ -19,6 +20,7 @@ type HandleManager struct {
 	ethurl string
 }
 
+// NewHandleManager creates a new HandleManager with the given database, Ethereum client, and Ethereum URL.
 func NewHandleManager(db *gorm.DB, client *ethclient.Client, ethurl string) *HandleManager {
 	return &HandleManager{
 		router: gin.Default(),
@@ -28,28 +30,43 @@ func NewHandleManager(db *gorm.DB, client *ethclient.Client, ethurl string) *Han
 	}
 }
 
+// InitRouter initializes all routes and their respective handlers.
 func (hm *HandleManager) InitRouter() *gin.Engine {
-	// model handlers
+	hm.setupUserRoutes()
+	hm.setupTransactionRoutes()
+	hm.setupPersonRoutes()
+	return hm.router
+}
+
+// setupUserRoutes sets up routes related to user operations.
+func (hm *HandleManager) setupUserRoutes() {
 	userHandler := handlers.NewUserHandler(repository.NewUserRepository(hm.db))
+
+	hm.router.GET("/users", userHandler.FetchUsers)
+	hm.router.POST("/user", userHandler.CreateUser)
+	hm.router.POST("/auth", userHandler.Authenticate)
+	hm.router.GET("/my", middleware.AuthenticateMiddleware(), userHandler.FetchUserTransactions)
+}
+
+// setupTransactionRoutes sets up routes related to transaction operations.
+func (hm *HandleManager) setupTransactionRoutes() {
 	transactionHandler := handlers.NewTransactionHandler(
 		repository.NewTransactionRepository(hm.db),
 		repository.NewUserRepository(hm.db),
 		egateway.NewEthereumGateway(hm.ethurl),
 	)
+
+	hm.router.GET("/transactions", transactionHandler.FetchTransactions)
+	hm.router.GET("/eth", middleware.AuthenticateMiddleware(), transactionHandler.FetchTransactionsList)
+}
+
+// setupPersonRoutes sets up routes related to person operations.
+func (hm *HandleManager) setupPersonRoutes() {
 	personHandler := chandler.NewPersonHandler(
 		crepo.NewPersonRepository(hm.db),
 		hm.client,
 	)
-	// user routes
-	hm.router.GET("/users", userHandler.FetchUsers)
-	hm.router.POST("/user", userHandler.CreateUser)
-	hm.router.POST("/auth", userHandler.Authenticate)
-	hm.router.GET("/my", middleware.AuthenticateMiddleware(), userHandler.FetchUserTransactions)
-	// transaction routes
-	hm.router.GET("/transactions", transactionHandler.FetchTransactions)
-	hm.router.GET("/eth", middleware.AuthenticateMiddleware(), transactionHandler.FetchTransactionsList)
-	// person routes
+
 	hm.router.POST("/savePerson", personHandler.SavePerson)
 	hm.router.GET("/listPeople", personHandler.ListPeople)
-	return hm.router
 }

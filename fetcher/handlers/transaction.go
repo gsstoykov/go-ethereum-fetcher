@@ -10,12 +10,14 @@ import (
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/repository"
 )
 
+// TransactionHandler handles transaction-related requests.
 type TransactionHandler struct {
 	tr repository.ITransactionRepository
 	ur repository.IUserRepository
 	eg egateway.IEthereumGateway
 }
 
+// NewTransactionHandler creates a new TransactionHandler instance.
 func NewTransactionHandler(tr repository.ITransactionRepository, ur repository.IUserRepository, eg egateway.IEthereumGateway) *TransactionHandler {
 	return &TransactionHandler{
 		tr: tr,
@@ -24,53 +26,58 @@ func NewTransactionHandler(tr repository.ITransactionRepository, ur repository.I
 	}
 }
 
-func (th TransactionHandler) FetchTransactions(ctx *gin.Context) {
+// FetchTransactions handles fetching all transactions.
+// It retrieves all transactions from the database and returns them in the response.
+func (th *TransactionHandler) FetchTransactions(ctx *gin.Context) {
 	var ts []model.Transaction
 	ts, err := th.tr.FindAll()
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to fetch transactions: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions: " + err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"transactions": ts})
 }
 
-func (th TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
-	// Get the list of transactionHashes
+// FetchTransactionsList handles fetching a list of transactions by their hashes.
+// It retrieves the transactions from the database or the Ethereum gateway if not found in the database.
+func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
+	// Get the list of transactionHashes from query parameters
 	txHashes := ctx.QueryArray("transactionHashes")
 
-	username, _ := ctx.Get("username")
-
-	user, err := th.ur.FindByUsername(fmt.Sprint(username))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	var user *model.User = nil
+	username, exists := ctx.Get("username")
+	if exists {
+		user, _ = th.ur.FindByUsername(fmt.Sprint(username))
 	}
 
 	var txs []model.Transaction
-
-	// Fetch for all transactionHashes
 	for _, txHash := range txHashes {
 		tx, err := th.tr.FindByTransactionHash(txHash)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			fmt.Printf("Failed to find transaction by hash %s: %v\n", txHash, err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transaction: " + err.Error()})
 			return
 		}
 		if tx == nil {
 			tx, err = th.eg.GetByTransactionHash(txHash)
 			if err != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				fmt.Printf("Failed to fetch transaction from Ethereum gateway: %v\n", err)
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transaction from Ethereum gateway: " + err.Error()})
 				return
 			}
 			tx, err = th.tr.Create(tx)
 			if err != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				fmt.Printf("Failed to create transaction: %v\n", err)
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction: " + err.Error()})
 				return
 			}
 		}
 		if user != nil {
 			err = th.ur.AddTransactionToUser(user, tx)
 			if err != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				fmt.Printf("Failed to associate transaction with user %s: %v\n", user.Username, err)
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to associate transaction with user: " + err.Error()})
 			}
 		}
 		txs = append(txs, *tx)
@@ -78,18 +85,23 @@ func (th TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"transactions": txs})
 }
 
-func (th TransactionHandler) CreateTransaction(ctx *gin.Context) {
+// CreateTransaction handles the creation of a new transaction.
+// It binds the JSON request to the transaction model and stores it in the database.
+func (th *TransactionHandler) CreateTransaction(ctx *gin.Context) {
 	var t model.Transaction
 	if err := ctx.ShouldBindJSON(&t); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to bind JSON: %v\n", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input: " + err.Error()})
 		return
 	}
 
 	ct, err := th.tr.Create(&t)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Printf("Failed to create transaction: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction: " + err.Error()})
 		return
 	}
 
+	// Respond with the created transaction
 	ctx.JSON(http.StatusCreated, gin.H{"transaction": ct})
 }
