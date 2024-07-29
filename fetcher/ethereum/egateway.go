@@ -78,6 +78,10 @@ func (eg *EthereumGateway) getTransactionByHash(hash string) (map[string]interfa
 		return nil, fmt.Errorf("error sending request to get transaction: %w", err)
 	}
 
+	if len(response.Result) == 0 {
+		return nil, fmt.Errorf("transaction hash not found on Ethereum")
+	}
+
 	return response.Result, nil
 }
 
@@ -94,6 +98,10 @@ func (eg *EthereumGateway) getTransactionReceipt(hash string) (map[string]interf
 	response, err := eg.sendRequest(payload)
 	if err != nil {
 		return nil, fmt.Errorf("error sending request to get transaction receipt: %w", err)
+	}
+
+	if len(response.Result) == 0 {
+		return nil, fmt.Errorf("transaction hash not found on Ethereum")
 	}
 
 	return response.Result, nil

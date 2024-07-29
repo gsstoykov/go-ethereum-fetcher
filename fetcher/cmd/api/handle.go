@@ -58,6 +58,7 @@ func (hm *HandleManager) setupTransactionRoutes() {
 
 	hm.router.GET("/transactions", transactionHandler.FetchTransactions)
 	hm.router.GET("/eth", middleware.AuthenticateMiddleware(), transactionHandler.FetchTransactionsList)
+	hm.router.GET("/eth/:rlphex", middleware.RLPDecodeMiddleware(), middleware.AuthenticateMiddleware(), transactionHandler.FetchTransactionsList)
 }
 
 // setupPersonRoutes sets up routes related to person operations.

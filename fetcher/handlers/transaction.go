@@ -42,8 +42,19 @@ func (th *TransactionHandler) FetchTransactions(ctx *gin.Context) {
 // FetchTransactionsList handles fetching a list of transactions by their hashes.
 // It retrieves the transactions from the database or the Ethereum gateway if not found in the database.
 func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
-	// Get the list of transactionHashes from query parameters
-	txHashes := ctx.QueryArray("transactionHashes")
+	var txHashes []string
+
+	// Check if transactionHashes were set via the RLP middleware
+	if hashes, exists := ctx.Get("transactionHashes"); exists {
+		var ok bool
+		if txHashes, ok = hashes.([]string); !ok {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid transaction hashes format in context"})
+			return
+		}
+	} else {
+		// Fallback to query parameters if no RLP data is provided
+		txHashes = ctx.QueryArray("transactionHashes")
+	}
 
 	var user *model.User = nil
 	username, exists := ctx.Get("username")
@@ -55,16 +66,11 @@ func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 	for _, txHash := range txHashes {
 		tx, err := th.tr.FindByTransactionHash(txHash)
 		if err != nil {
-			fmt.Printf("Failed to find transaction by hash %s: %v\n", txHash, err)
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transaction: " + err.Error()})
-			return
-		}
-		if tx == nil {
+			fmt.Printf("Failed to find transaction by hash in db %s: %v\n", txHash, err)
 			tx, err = th.eg.GetByTransactionHash(txHash)
 			if err != nil {
 				fmt.Printf("Failed to fetch transaction from Ethereum gateway: %v\n", err)
-				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transaction from Ethereum gateway: " + err.Error()})
-				return
+				continue
 			}
 			tx, err = th.tr.Create(tx)
 			if err != nil {
@@ -73,11 +79,13 @@ func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 				return
 			}
 		}
+
 		if user != nil {
 			err = th.ur.AddTransactionToUser(user, tx)
 			if err != nil {
 				fmt.Printf("Failed to associate transaction with user %s: %v\n", user.Username, err)
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to associate transaction with user: " + err.Error()})
+				return
 			}
 		}
 		txs = append(txs, *tx)
