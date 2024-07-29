@@ -1,8 +1,57 @@
-# go-ethereum-fetcher
+# Go Ethereum Fetcher
 
-# API Documentation
+An application to interact with the Ethereum blockchain and manage transactions using Go and the Gin framework.
 
-## User Routes
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Endpoints](#endpoints)
+- [Code Overview](#code-overview)
+  - [Handlers](#handlers)
+  - [Repositories](#repositories)
+  - [Ethereum Gateway](#ethereum-gateway)
+  - [Models](#models)
+- [Running Tests](#running-tests)
+- [License](#license)
+
+## Prerequisites
+
+- Go 1.18 or higher
+- Docker
+- Docker Compose
+
+## Installation
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/gsstoykov/go-ethereum-fetcher.git
+   cd go-ethereum-fetcher
+   ```
+
+2. Build and start the application using Docker:
+   ```sh
+   docker-compose build
+   docker-compose up
+   ```
+
+## Configuration
+
+The application requires a few environment variables to be set. Create a `.env` file in the root of your project with the following content:
+
+```sh
+API_PORT=<your_api_port>
+DB_CONNECTION_STRING=<your_db_con_str>
+ETH_NODE_URL=<url_with_your_api_key>
+JWT_STRING=<your_secret>
+PRIVATE_KEY=<your_private_key>
+CONTRACT_ADDRESS=<your_contract_address>
+WS_NODE_URL=<ws_url_with_your_api_key>
+```
+
+## Endpoints
 
 ### Fetch Users
 
@@ -204,3 +253,15 @@
     }
     ```
   - **Description:** Returns the list of people with their details saved to db.
+
+## Running Tests
+
+Tests can be run using the Go testing framework. Use the following command to run all tests:
+
+```sh
+go test ./...
+```
+
+## License
+
+This project is licensed under the MIT License.
