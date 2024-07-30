@@ -8,11 +8,6 @@ An application to interact with the Ethereum blockchain and manage transactions 
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Endpoints](#endpoints)
-- [Code Overview](#code-overview)
-  - [Handlers](#handlers)
-  - [Repositories](#repositories)
-  - [Ethereum Gateway](#ethereum-gateway)
-  - [Models](#models)
 - [Running Tests](#running-tests)
 - [License](#license)
 
@@ -32,6 +27,7 @@ An application to interact with the Ethereum blockchain and manage transactions 
    ```
 
 2. Build and start the application using Docker:
+
    ```sh
    docker-compose build
    docker-compose up
@@ -50,6 +46,20 @@ PRIVATE_KEY=<your_private_key>
 CONTRACT_ADDRESS=<your_contract_address>
 WS_NODE_URL=<ws_url_with_your_api_key>
 ```
+
+### [Opt.] Deploy `SimplePersonInfoContract.sol`
+
+Smart contract ABI was generated following:
+https://goethereumbook.org/smart-contracts/
+https://geth.ethereum.org/docs/developers/dapp-developer/native-bindings
+
+```sh
+go run contract/deploy/person.go
+```
+
+For testing purposes you can use my already deployed contract found at:
+https://sepolia.etherscan.io/address/0xEe0D53C64AC1aad09861a139c52bDD087d3eeaCC
+On this address you can also see my call history during development.
 
 ## Endpoints
 
@@ -211,8 +221,6 @@ WS_NODE_URL=<ws_url_with_your_api_key>
 - **Request:**
   - **Method:** POST
   - **URL:** `/savePerson`
-  - **Headers:**
-    - `Authorization: Bearer <token>`
   - **Body:**
     ```json
     {
