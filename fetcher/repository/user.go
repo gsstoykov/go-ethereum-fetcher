@@ -70,9 +70,6 @@ func (r *UserRepository) FindById(userId uint) (*model.User, error) {
 func (r *UserRepository) FindByUsername(username string) (*model.User, error) {
 	var user model.User
 	if err := r.Db.Where("username = ?", username).First(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
 		return nil, fmt.Errorf("could not find user by username: %w", err)
 	}
 	return &user, nil

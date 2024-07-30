@@ -3,6 +3,7 @@ package listener
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/big"
 	"os"
 	"strings"
@@ -51,14 +52,17 @@ func SubPIC(ctx context.Context, client *ethclient.Client, prepo repository.IPer
 	// Parse the ABI definition of the contract
 	contractAbi, err := abi.JSON(strings.NewReader(PIUpdatedABI))
 	if err != nil {
-		return fmt.Errorf("failed to parse ABI: %w", err)
+		log.Printf("Failed to parse ABI: %v", err)
+		return err
 	}
 
 	// Define the event topic for PersonInfoUpdated
 	personInfoTopic := crypto.Keccak256Hash([]byte("PersonInfoUpdated(uint256,string,uint256)"))
 	contractAddress := common.HexToAddress(os.Getenv("CONTRACT_ADDRESS"))
 	if contractAddress == (common.Address{}) {
-		return fmt.Errorf("CONTRACT_ADDRESS environment variable is not set or invalid")
+		err := fmt.Errorf("CONTRACT_ADDRESS environment variable is not set or invalid")
+		log.Print(err)
+		return err
 	}
 
 	// Create a filter query to listen for the specific event on the given contract address
@@ -71,36 +75,38 @@ func SubPIC(ctx context.Context, client *ethclient.Client, prepo repository.IPer
 	ch := make(chan types.Log)
 	sub, err := client.SubscribeFilterLogs(ctx, query, ch)
 	if err != nil {
-		return fmt.Errorf("failed to subscribe to logs: %w", err)
+		log.Printf("Failed to subscribe to logs: %v", err)
+		return err
 	}
 	defer sub.Unsubscribe()
 
-	fmt.Println("Listening for events on SimplePersonInfoContract with address: ", contractAddress)
+	log.Printf("Listening for events on SimplePersonInfoContract with address: %s", contractAddress.Hex())
 	// Process logs received on the channel
 	for {
 		select {
-		case log := <-ch:
+		case clog := <-ch:
 			var eventData struct {
 				PersonIndex *big.Int
 				NewName     string
 				NewAge      *big.Int
 			}
-			if err := unpackPICLog(contractAbi, log, &eventData); err != nil {
-				fmt.Printf("Failed to unpack log: %v\n", err)
+			if err := unpackPICLog(contractAbi, clog, &eventData); err != nil {
+				log.Printf("Failed to unpack log: %v", err)
 				continue
 			}
 
-			fmt.Println("Received valid log from SimplePersonInfoContract with address: ", contractAddress)
+			log.Printf("Received valid log from SimplePersonInfoContract with address: %s", contractAddress.Hex())
 
 			// Create or update person in the repository
 			p := &model.Person{Name: eventData.NewName, Age: eventData.NewAge.Int64()}
 			if _, err := prepo.Create(p); err != nil {
-				fmt.Printf("Failed to create person: %v\n", err)
+				log.Printf("Failed to create person: %v", err)
 				continue
 			}
 
 		case <-ctx.Done():
 			// Exit gracefully on context cancellation
+			log.Println("Context done, exiting gracefully")
 			return nil
 		}
 	}
@@ -108,9 +114,9 @@ func SubPIC(ctx context.Context, client *ethclient.Client, prepo repository.IPer
 
 // unpackPICLog extracts event data from the log using the provided ABI.
 // Returns an error if the log does not match the expected event or if parsing fails.
-func unpackPICLog(contractAbi abi.ABI, log types.Log, eventData interface{}) error {
+func unpackPICLog(contractAbi abi.ABI, clog types.Log, eventData interface{}) error {
 	for _, evInfo := range contractAbi.Events {
-		if evInfo.ID.Hex() != log.Topics[0].Hex() {
+		if evInfo.ID.Hex() != clog.Topics[0].Hex() {
 			continue
 		}
 		// Filter indexed arguments
@@ -121,10 +127,16 @@ func unpackPICLog(contractAbi abi.ABI, log types.Log, eventData interface{}) err
 			}
 		}
 		// Parse topics and unpack data
-		if err := abi.ParseTopics(eventData, indexed, log.Topics[1:]); err != nil {
-			return fmt.Errorf("failed to parse topics: %w", err)
+		if err := abi.ParseTopics(eventData, indexed, clog.Topics[1:]); err != nil {
+			log.Printf("Failed to parse topics: %v", err)
+			return err
 		}
-		return contractAbi.UnpackIntoInterface(eventData, evInfo.Name, log.Data)
+		if err := contractAbi.UnpackIntoInterface(eventData, evInfo.Name, clog.Data); err != nil {
+			log.Printf("Failed to unpack data: %v", err)
+			return err
+		}
+		return nil
 	}
+	log.Printf("Event not found in log: %v", clog)
 	return fmt.Errorf("event not found in log")
 }

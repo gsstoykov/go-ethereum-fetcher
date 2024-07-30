@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,7 @@ func (th *TransactionHandler) FetchTransactions(ctx *gin.Context) {
 	var ts []model.Transaction
 	ts, err := th.tr.FindAll()
 	if err != nil {
-		fmt.Printf("Failed to fetch transactions: %v\n", err)
+		log.Printf("Failed to fetch transactions: %v\n", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions: " + err.Error()})
 		return
 	}
@@ -66,15 +67,15 @@ func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 	for _, txHash := range txHashes {
 		tx, err := th.tr.FindByTransactionHash(txHash)
 		if err != nil {
-			fmt.Printf("Failed to find transaction by hash in db %s: %v\n", txHash, err)
+			log.Printf("Failed to find transaction by hash in db %s: %v\n", txHash, err)
 			tx, err = th.eg.GetByTransactionHash(txHash)
 			if err != nil {
-				fmt.Printf("Failed to fetch transaction from Ethereum gateway: %v\n", err)
+				log.Printf("Failed to fetch transaction from Ethereum gateway: %v\n", err)
 				continue
 			}
 			tx, err = th.tr.Create(tx)
 			if err != nil {
-				fmt.Printf("Failed to create transaction: %v\n", err)
+				log.Printf("Failed to create transaction: %v\n", err)
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction: " + err.Error()})
 				return
 			}
@@ -83,7 +84,7 @@ func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 		if user != nil {
 			err = th.ur.AddTransactionToUser(user, tx)
 			if err != nil {
-				fmt.Printf("Failed to associate transaction with user %s: %v\n", user.Username, err)
+				log.Printf("Failed to associate transaction with user %s: %v\n", user.Username, err)
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to associate transaction with user: " + err.Error()})
 				return
 			}
@@ -98,14 +99,14 @@ func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 func (th *TransactionHandler) CreateTransaction(ctx *gin.Context) {
 	var t model.Transaction
 	if err := ctx.ShouldBindJSON(&t); err != nil {
-		fmt.Printf("Failed to bind JSON: %v\n", err)
+		log.Printf("Failed to bind JSON: %v\n", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input: " + err.Error()})
 		return
 	}
 
 	ct, err := th.tr.Create(&t)
 	if err != nil {
-		fmt.Printf("Failed to create transaction: %v\n", err)
+		log.Printf("Failed to create transaction: %v\n", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction: " + err.Error()})
 		return
 	}
