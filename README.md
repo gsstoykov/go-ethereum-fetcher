@@ -7,6 +7,7 @@ An application to interact with the Ethereum blockchain and manage transactions 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [Architecture](#architecture)
 - [Endpoints](#endpoints)
 - [Running Tests](#running-tests)
 - [License](#license)
@@ -60,6 +61,83 @@ go run contract/deploy/person.go
 For testing purposes you can use my already deployed contract found at:
 https://sepolia.etherscan.io/address/0xEe0D53C64AC1aad09861a139c52bDD087d3eeaCC
 On this address you can also see my call history during development.
+
+## Architecture
+
+![Alt text](xdiagrams/architecture_overview.png)
+
+### Fetcher Overview
+
+The Ethereum `Fetcher` is a REST API that facilitates interaction with Ethereum blockchain data. It provides endpoints for user management, transaction retrieval, and data persistence via database storage, utilizing middleware for authentication and data processing.
+
+![Alt text](xdiagrams/fetcher_no_contract.png)
+
+#### Handle Manager
+
+The `HandleManager` responsible for setting up and managing the HTTP routes and their respective handlers using the Gin web framework. This component interacts with various other components such as repositories, handlers, middleware, and the Ethereum client to serve API requests.
+
+#### Handles
+
+##### Transaction Handle
+
+The `TransactionHandler` is responsible for handling HTTP requests related to transactions. It works closely with the transaction and user repositories, as well as the `Ethereum Gateway`, to process and respond to transaction-related operations.
+
+##### User Handle
+
+The `UserHandler` is responsible for handling HTTP requests related to user operations such as user creation, authentication, fetching user details, and fetching user transactions. It integrates with the user repository and employs JWT for secure authentication.
+
+#### Middleware
+
+##### Authentication Middleware
+
+The `AuthenticateMiddleware` is responsible for handling JWT token authentication for HTTP requests. It ensures that only authenticated users can access certain routes by validating the JWT token provided in the Authorization header of the request.
+
+##### Decode Middleware
+
+The `RLPDecodeMiddleware` is responsible for decoding specific RLP transaction hash input in HTTP requests.
+
+#### Ethereum Gateway
+
+The `EthereumGateway` provides a mechanism for interacting with the Ethereum blockchain via RPC calls. It allows for the retrieval of transaction details using transaction hashes. The package includes interfaces and implementations necessary to fetch and process Ethereum transaction data.
+
+#### Repositories
+
+The repository package provides a data access layer for interacting with the `Transaction` and `User` models using the GORM library. This package abstracts the database operations related to transactions and users, offering a clean API for creating, updating, deleting, and retrieving transactions and users.
+
+#### Models
+
+The model package defines the schema for the `Transaction` and `User` models used with the GORM ORM library. This struct maps to a table in the database and represents a transaction or user with various attributes.
+
+### Contract Package Overview
+
+The contract package serves as a plugin for handling contract interactions and data for the the Ethereum `Fetcher` and `Listener`. It provides generated
+bindings for smart contracts and also necessary handlers, repositories and models in order to be compatible with the `Fetcher` REST architecture. The package is provided to the `Fetcher` and `Listener` componenents in the initial Docker container initialization and is thus reused by both. Could be further extended with providing ABIs for multiple contracts.
+
+![Alt text](xdiagrams/fetcher_contract.png)
+
+#### Handles
+
+##### Person Handler
+
+The `PersonHandler` provides associated methods for handling HTTP requests related to Person entities defined in the `SimplePersonInfoContract`, interacting with both a database and an Ethereum smart contract. Intended to be used by the Fetcher `Handler Manager`.
+
+#### Repositories
+
+The repository package provides a data access layer for interacting with the `Person` contract model using the GORM library. This package abstracts the database operations related to `Person`, offering a clean API for creating, updating, deleting, and retrieving a `Person` data entry.
+
+#### Models
+
+The model package defines the schema for the `Person` model used with the GORM ORM library. This struct maps to a table in the database and represents a `Person` entry with various attributes.
+
+### Listener Overview
+
+The `Listener` is used for listening for updates to information on the Ethereum blockchain and synchronizes these updates with a local PostgreSQL database. It subscribes to blockchain events, processes these events, and updates the local database accordingly.
+
+#### Listeners
+
+##### PIC Listener
+
+Currently the `Listener` consists of a single listener for `SimplePersonInfoContract`. The `PIC Listener` subscribes to the `PersonInfoUpdated`(provided by the contract package) events from a deployed `SimplePersonInfoContract`. If the `Listener` manages to retrieve an event log and unpack proper data(conforming to the contract model definitions from the contract package) it saves it to the database.
 
 ## Endpoints
 
