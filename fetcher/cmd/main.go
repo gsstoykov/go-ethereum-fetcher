@@ -8,17 +8,11 @@ import (
 	cmodel "github.com/gsstoykov/go-ethereum-fetcher/contract/model"
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/cmd/api"
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/model"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
 	// Get DB connection string and initialize database
 	connstr := os.Getenv("DB_CONNECTION_STRING")
 	if connstr == "" {

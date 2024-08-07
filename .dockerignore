@@ -1,0 +1,33 @@
+# Exclude Go build artifacts
+*.test
+*.out
+bin/
+build/
+
+# Exclude dependency directories (if vendoring is used)
+vendor/
+
+# Exclude IDE/editor configuration directories
+.vscode/
+.idea/
+
+# Exclude environment files
+.env
+
+# Exclude version control system directories
+.git/
+.gitignore
+
+# Exclude operating system files
+.DS_Store
+Thumbs.db
+
+# Exclude temporary files
+*.tmp
+*.log
+*.swp
+*.swo
+
+# Exclude documentation and test directories if not needed in production
+docs/
+tests/

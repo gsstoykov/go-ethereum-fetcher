@@ -6,18 +6,22 @@ WORKDIR /app
 RUN apk add --no-cache libc-dev gcc
 
 COPY go.mod go.sum ./
-
 RUN go mod download
 
 COPY fetcher/ ./fetcher/
-COPY .env .
 COPY contract/ ./contract/
 
 RUN go build \
-    -ldflags="-linkmode external -extldflags -static" \
+    -ldflags="-s -w -linkmode external -extldflags -static" \
     -tags netgo \
     -o ethereum-fetcher ./fetcher/cmd
 
 EXPOSE 8080
+
+# Final Stage
+FROM scratch
+
+COPY --from=build /app/ethereum-fetcher /ethereum-fetcher
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 CMD ["./ethereum-fetcher"]

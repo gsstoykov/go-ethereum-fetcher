@@ -6,16 +6,20 @@ WORKDIR /app
 RUN apk add --no-cache libc-dev gcc
 
 COPY go.mod go.sum ./
-
 RUN go mod download
 
 COPY listener/ ./listener/
-COPY .env .
 COPY contract/ ./contract/
 
 RUN go build \
-    -ldflags="-linkmode external -extldflags -static" \
+    -ldflags="-s -w -linkmode external -extldflags -static" \
     -tags netgo \
     -o contract-listener ./listener/cmd
 
-CMD ["./contract-listener"]
+# Final Stage
+FROM scratch
+
+COPY --from=build /app/contract-listener /contract-listener
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+CMD ["/contract-listener"]

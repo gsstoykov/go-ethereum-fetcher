@@ -8,17 +8,11 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gsstoykov/go-ethereum-fetcher/contract/repository"
 	"github.com/gsstoykov/go-ethereum-fetcher/listener"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
 	// Get database connection string and initialize database
 	connstr := os.Getenv("DB_CONNECTION_STRING")
 	if connstr == "" {

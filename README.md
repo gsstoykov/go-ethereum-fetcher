@@ -30,8 +30,8 @@ An application to interact with the Ethereum blockchain and manage transactions 
 2. Build and start the application using Docker:
 
    ```sh
-   docker-compose build
-   docker-compose up
+   docker compose build
+   docker compose up
    ```
 
 ## Configuration
