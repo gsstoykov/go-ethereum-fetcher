@@ -33,13 +33,12 @@ services:
     image: postgres:16.0-alpine
     volumes:
       - pgdata:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=pwd
-      - POSTGRES_DB=db
     networks:
       - backend
     ports:
       - 5432:5432
+    env_file:
+      - ./.env
 
 volumes:
   pgdata:

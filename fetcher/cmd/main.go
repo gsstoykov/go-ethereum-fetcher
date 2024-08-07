@@ -23,12 +23,12 @@ func main() {
 
 	db, err := gorm.Open(postgres.Open(connstr), &gorm.Config{
 		Logger: logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
 			logger.Config{
-				SlowThreshold:             time.Second,   // Slow SQL threshold
-				LogLevel:                  logger.Silent, // Log level
-				IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-				ParameterizedQueries:      true,          // Don't include params in the SQL log
+				SlowThreshold:             time.Second,
+				LogLevel:                  logger.Silent,
+				IgnoreRecordNotFoundError: true,
+				ParameterizedQueries:      true,
 			},
 		),
 	})
