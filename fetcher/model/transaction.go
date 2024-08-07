@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Transaction struct {
 	gorm.Model
-	TransactionHash   string `json:"transactionHash" gorm:"column:transaction_hash"`
+	TransactionHash   string `json:"transactionHash" gorm:"column:transaction_hash;unique;not null"`
 	TransactionStatus int    `json:"transactionStatus" gorm:"column:transaction_status"`
 	BlockHash         string `json:"blockHash" gorm:"column:block_hash"`
 	BlockNumber       int    `json:"blockNumber" gorm:"column:block_number"`

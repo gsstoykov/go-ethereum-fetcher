@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	cmodel "github.com/gsstoykov/go-ethereum-fetcher/contract/model"
@@ -10,6 +11,7 @@ import (
 	"github.com/gsstoykov/go-ethereum-fetcher/fetcher/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -19,9 +21,24 @@ func main() {
 		log.Fatalf("Environment variable %s not set", "DB_CONNECTION_STRING")
 	}
 
-	db, err := gorm.Open(postgres.Open(connstr), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(connstr), &gorm.Config{
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second,   // Slow SQL threshold
+				LogLevel:                  logger.Silent, // Log level
+				IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
+				ParameterizedQueries:      true,          // Don't include params in the SQL log
+			},
+		),
+	})
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
+	}
+
+	// Run database migrations
+	if err := db.AutoMigrate(&model.User{}, &model.Transaction{}, &cmodel.Person{}); err != nil {
+		log.Fatalf("Database migration failed: %v", err)
 	}
 
 	// Get Ethereum node URL and initialize Ethereum client
@@ -33,11 +50,6 @@ func main() {
 	client, err := ethclient.Dial(ethurl)
 	if err != nil {
 		log.Fatalf("Could not connect to Ethereum node: %v", err)
-	}
-
-	// Run database migrations
-	if err := db.AutoMigrate(&model.User{}, &model.Transaction{}, &cmodel.Person{}); err != nil {
-		log.Fatalf("Database migration failed: %v", err)
 	}
 
 	// Initialize and start EthereumFetcher

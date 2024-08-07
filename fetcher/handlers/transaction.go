@@ -34,7 +34,7 @@ func (th *TransactionHandler) FetchTransactions(ctx *gin.Context) {
 	ts, err := th.tr.FindAll()
 	if err != nil {
 		log.Printf("Failed to fetch transactions: %v\n", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions: " + err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions!"})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"transactions": ts})
@@ -76,7 +76,7 @@ func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 			tx, err = th.tr.Create(tx)
 			if err != nil {
 				log.Printf("Failed to create transaction: %v\n", err)
-				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction: " + err.Error()})
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction!"})
 				return
 			}
 		}
@@ -85,7 +85,7 @@ func (th *TransactionHandler) FetchTransactionsList(ctx *gin.Context) {
 			err = th.ur.AddTransactionToUser(user, tx)
 			if err != nil {
 				log.Printf("Failed to associate transaction with user %s: %v\n", user.Username, err)
-				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to associate transaction with user: " + err.Error()})
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to associate transaction with user!"})
 				return
 			}
 		}
@@ -100,14 +100,14 @@ func (th *TransactionHandler) CreateTransaction(ctx *gin.Context) {
 	var t model.Transaction
 	if err := ctx.ShouldBindJSON(&t); err != nil {
 		log.Printf("Failed to bind JSON: %v\n", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input: " + err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input!"})
 		return
 	}
 
 	ct, err := th.tr.Create(&t)
 	if err != nil {
 		log.Printf("Failed to create transaction: %v\n", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction: " + err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction!"})
 		return
 	}
 

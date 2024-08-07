@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"math/big"
 	"net/http"
 	"os"
@@ -33,7 +34,8 @@ func (ph *PersonHandler) SavePerson(ctx *gin.Context) {
 
 	// Bind JSON input to the person struct.
 	if err := ctx.BindJSON(&person); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		log.Printf("Invalid input: %v\n", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input!"})
 		return
 	}
 
@@ -43,21 +45,24 @@ func (ph *PersonHandler) SavePerson(ctx *gin.Context) {
 	// Instantiate the smart contract.
 	instance, err := contract.NewSimplePersonInfoContract(contractAddress, ph.client)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to instantiate smart contract instance"})
+		log.Printf("Failed to instantiate contract instance: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to instantiate smart contract instance!"})
 		return
 	}
 
 	// Build the transactor.
 	transactor, err := contract.BuildTransactor(ph.client)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could not build transactor"})
+		log.Printf("Could not build transactor: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could not build transactor!"})
 		return
 	}
 
 	// Set person info on the smart contract.
 	tx, err := instance.SetPersonInfo(transactor, person.Name, big.NewInt(person.Age))
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to set person info on smart contract"})
+		log.Printf("Failed to set person info on smart contract: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to set person info on smart contract!"})
 		return
 	}
 
@@ -69,7 +74,8 @@ func (ph *PersonHandler) SavePerson(ctx *gin.Context) {
 func (ph *PersonHandler) ListPeople(ctx *gin.Context) {
 	people, err := ph.pr.FindAll()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch people"})
+		log.Printf("Failed to fetch people from contract: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch people!"})
 		return
 	}
 

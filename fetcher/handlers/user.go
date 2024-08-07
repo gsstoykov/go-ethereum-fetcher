@@ -40,14 +40,14 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 	var u model.User
 	if err := ctx.ShouldBindJSON(&u); err != nil {
 		log.Printf("Failed to bind JSON: %v\n", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input: " + err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input!"})
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("Failed to hash password: %v\n", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password: " + err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password!"})
 		return
 	}
 
@@ -57,7 +57,7 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 	})
 	if err != nil {
 		log.Printf("Failed to create user: %v\n", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user: " + err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user!"})
 		return
 	}
 
@@ -79,14 +79,14 @@ func (uh *UserHandler) Authenticate(ctx *gin.Context) {
 	storedUser, err := uh.ur.FindByUsername(user.Username)
 	if err != nil {
 		log.Printf("Failed to find user by username: %v\n", err)
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password!"})
 		return
 	}
 
 	// Verify the password
 	if err := bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(user.Password)); err != nil {
 		log.Printf("Password mismatch for user %s: %v\n", user.Username, err)
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password!"})
 		return
 	}
 
@@ -94,7 +94,7 @@ func (uh *UserHandler) Authenticate(ctx *gin.Context) {
 	token, err := uh.generateToken(storedUser.Username, time.Hour*12)
 	if err != nil {
 		log.Printf("Failed to generate token for user %s: %v\n", user.Username, err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token!"})
 		return
 	}
 
@@ -139,7 +139,7 @@ func (uh *UserHandler) FetchUsers(ctx *gin.Context) {
 	users, err := uh.ur.FindAll()
 	if err != nil {
 		log.Printf("Failed to fetch users: %v\n", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users: " + err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users!"})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"users": users})
@@ -158,14 +158,14 @@ func (uh *UserHandler) FetchUserTransactions(ctx *gin.Context) {
 	user, err := uh.ur.FindByUsername(fmt.Sprint(username))
 	if err != nil {
 		log.Printf("Failed to find user by username: %v\n", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user: " + err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user!"})
 		return
 	}
 
 	txs, err := uh.ur.FindUserTransactions(user.ID)
 	if err != nil {
 		log.Printf("Failed to fetch transactions for user %s: %v\n", user.Username, err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions: " + err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions!"})
 		return
 	}
 
