@@ -46,6 +46,8 @@ JWT_STRING=<your_secret>
 PRIVATE_KEY=<your_private_key>
 CONTRACT_ADDRESS=<your_contract_address>
 WS_NODE_URL=<ws_url_with_your_api_key>
+POSTGRES_PASSWORD=<your_postgres_pwd>
+POSTGRES_DB=<your_postgres_db>
 ```
 
 ### [Opt.] Deploy `SimplePersonInfoContract.sol`
