@@ -56,6 +56,8 @@ Smart contract ABI was generated following:
 https://goethereumbook.org/smart-contracts/
 https://geth.ethereum.org/docs/developers/dapp-developer/native-bindings
 
+You can deploy your own instance using:
+
 ```sh
 go run contract/deploy/person.go
 ```
